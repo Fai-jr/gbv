@@ -13,11 +13,14 @@ type Service = {
   region: string;
 };
 
+const FILTERS = ["all", "legal aid", "medical", "psychosocial", "hotline"];
+
 export default function ContactsPage() {
   const { loading: authLoading } = useAuth();
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [activeFilter, setActiveFilter] = useState("all");
 
   useEffect(() => {
     if (authLoading) return;
@@ -41,21 +44,43 @@ export default function ContactsPage() {
     fetchServices();
   }, [authLoading]);
 
+  const filtered =
+    activeFilter === "all"
+      ? services
+      : services.filter((s) => s.type === activeFilter);
+
   return (
     <div className="mx-auto max-w-2xl p-6">
       <h1 className="mb-4 text-xl font-semibold text-zinc-900">
         Verified Contacts
       </h1>
 
+      <div className="mb-4 flex flex-wrap gap-2">
+        {FILTERS.map((f) => (
+          <button
+            key={f}
+            onClick={() => setActiveFilter(f)}
+            className={
+              "rounded-full px-3 py-1 text-sm capitalize " +
+              (activeFilter === f
+                ? "bg-zinc-900 text-white"
+                : "bg-zinc-100 text-zinc-700")
+            }
+          >
+            {f}
+          </button>
+        ))}
+      </div>
+
       {loading && <p className="text-sm text-zinc-500">Loading...</p>}
       {error && <p className="text-sm text-red-600">{error}</p>}
 
-      {!loading && !error && services.length === 0 && (
-        <p className="text-sm text-zinc-500">No contacts available yet.</p>
+      {!loading && !error && filtered.length === 0 && (
+        <p className="text-sm text-zinc-500">No contacts in this category yet.</p>
       )}
 
       <ul className="space-y-3">
-        {services.map((service) => {
+        {filtered.map((service) => {
           const callLink = "tel:" + service.phone;
           return (
             <li
