@@ -35,6 +35,7 @@ export default function StaffDashboard() {
     { label: "Training", href: "/staff/training", show: true },
     { label: "Manage verified contacts", href: "/admin/services", show: profile.role === "admin" },
     { label: "Staff accounts", href: "/admin/staff", show: profile.role === "admin" },
+    { label: "Feedback statistics", href: "/admin/feedback", show: profile.role === "admin" },
   ];
 
   return (
