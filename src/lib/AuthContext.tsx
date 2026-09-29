@@ -8,6 +8,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 type UserProfile = {
   role: "survivor" | "ngo_staff" | "shelter_staff" | "admin";
   orgId?: string;
+  email?: string;
 };
 
 type AuthContextType = {
@@ -18,12 +19,17 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType>({ user: null, profile: null, loading: true });
 
-async function ensureUserDoc(uid: string): Promise<UserProfile> {
+async function ensureUserDoc(uid: string, email?: string | null): Promise<UserProfile> {
   const ref = doc(db, "users", uid);
   try {
     const snap = await getDoc(ref);
     if (!snap.exists()) {
-      await setDoc(ref, { role: "survivor", createdAt: new Date().toISOString() });
+      const data: Record<string, unknown> = {
+        role: "survivor",
+        createdAt: new Date().toISOString(),
+      };
+      if (email) data.email = email;
+      await setDoc(ref, data);
       return { role: "survivor" };
     }
     return snap.data() as UserProfile;
@@ -41,7 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        const p = await ensureUserDoc(firebaseUser.uid);
+        const p = await ensureUserDoc(firebaseUser.uid, firebaseUser.email);
         setProfile(p);
         setUser(firebaseUser);
         setLoading(false);

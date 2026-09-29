@@ -34,6 +34,7 @@ export default function StaffDashboard() {
     { label: "Shelters", href: "/staff/shelter", show: SHELTER_ROLES.includes(profile.role) },
     { label: "Training", href: "/staff/training", show: true },
     { label: "Manage verified contacts", href: "/admin/services", show: profile.role === "admin" },
+    { label: "Staff accounts", href: "/admin/staff", show: profile.role === "admin" },
   ];
 
   return (
