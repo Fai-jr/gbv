@@ -33,6 +33,7 @@ export default function StaffDashboard() {
     { label: "Marketplace listings", href: "/staff/marketplace", show: true },
     { label: "Shelters", href: "/staff/shelter", show: SHELTER_ROLES.includes(profile.role) },
     { label: "Training", href: "/staff/training", show: true },
+    { label: "Manage verified contacts", href: "/admin/services", show: profile.role === "admin" },
   ];
 
   return (
