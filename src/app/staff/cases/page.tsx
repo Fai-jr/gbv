@@ -56,42 +56,42 @@ export default function CasesPage() {
 
   return (
     <div className="mx-auto max-w-md p-6">
-      <h1 className="mb-4 text-lg font-medium text-zinc-900">Cases</h1>
+      <h1 className="mb-4 text-lg font-medium text-ink">Cases</h1>
 
       <button
         onClick={() => router.push("/staff/cases/new")}
-        className="mb-4 w-full rounded bg-zinc-900 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+        className="mb-4 w-full rounded bg-plum py-2 text-sm font-medium text-white hover:bg-plum-dark"
       >
         + New case
       </button>
 
-      {fetching && <p className="text-sm text-zinc-500">Loading...</p>}
+      {fetching && <p className="text-sm text-muted">Loading...</p>}
       {!fetching && cases.length === 0 && (
-        <p className="text-sm text-zinc-500">No cases recorded yet.</p>
+        <p className="text-sm text-muted">No cases recorded yet.</p>
       )}
 
       <ul className="space-y-3">
         {cases.map((c) => (
-          <li key={c.id} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
-            <p className="font-medium text-zinc-900">{c.caseCode}</p>
-            <p className="text-sm text-zinc-600">
+          <li key={c.id} className="rounded-lg border border-border-soft bg-card p-4 shadow-sm">
+            <p className="font-medium text-ink">{c.caseCode}</p>
+            <p className="text-sm text-muted">
               {c.incidentType}, {c.ageGroup}
             </p>
             {c.servicesProvided?.length > 0 && (
-              <p className="mt-1 text-sm text-zinc-500">
+              <p className="mt-1 text-sm text-muted">
                 Services: {c.servicesProvided.join(", ")}
               </p>
             )}
-            {c.notes && <p className="mt-2 text-sm text-zinc-700">{c.notes}</p>}
+            {c.notes && <p className="mt-2 text-sm text-ink">{c.notes}</p>}
 
-            <label htmlFor={"status-" + c.id} className="mt-3 block text-xs text-zinc-500">
+            <label htmlFor={"status-" + c.id} className="mt-3 block text-xs text-muted">
               Status
             </label>
             <select
               id={"status-" + c.id}
               value={c.status}
               onChange={(e) => changeStatus(c.id, e.target.value)}
-              className="mt-1 w-full rounded border border-zinc-300 px-2 py-1 text-sm"
+              className="mt-1 w-full rounded border border-border-soft px-2 py-1 text-sm"
             >
               {STATUSES.map((s) => (
                 <option key={s} value={s}>

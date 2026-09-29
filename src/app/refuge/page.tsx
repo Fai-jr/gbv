@@ -43,20 +43,20 @@ export default function RefugePage() {
 
   return (
     <div className="mx-auto max-w-2xl p-6">
-      <h1 className="mb-2 text-xl font-semibold text-zinc-900">
+      <h1 className="mb-2 text-xl font-semibold text-ink">
         Find a Safe Place
       </h1>
-      <p className="mb-6 text-sm text-zinc-600">
+      <p className="mb-6 text-sm text-muted">
         Call one of these verified contacts. They will talk with you privately
         and arrange a safe way to reach a shelter. Nothing is shared with
         anyone else, and no location is sent from this app.
       </p>
 
-      {loading && <p className="text-sm text-zinc-500">Loading...</p>}
+      {loading && <p className="text-sm text-muted">Loading...</p>}
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       {!loading && !error && contacts.length === 0 && (
-        <p className="text-sm text-zinc-500">
+        <p className="text-sm text-muted">
           No verified contacts available in your area yet. Please try the
           general contacts page.
         </p>
@@ -68,11 +68,11 @@ export default function RefugePage() {
           return (
             <li
               key={c.id}
-              className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm"
+              className="rounded-lg border border-border-soft bg-card p-4 shadow-sm"
             >
-              <p className="font-medium text-zinc-900">{c.name}</p>
-              <p className="text-sm text-zinc-500">{c.region}</p>
-              <a href={callLink} className="mt-2 inline-block text-sm font-medium text-blue-600">
+              <p className="font-medium text-ink">{c.name}</p>
+              <p className="text-sm text-muted">{c.region}</p>
+              <a href={callLink} className="mt-2 inline-block text-sm font-medium text-plum">
                 Call {c.phone}
               </a>
             </li>

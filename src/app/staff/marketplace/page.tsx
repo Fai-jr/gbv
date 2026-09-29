@@ -46,24 +46,24 @@ export default function StaffMarketplacePage() {
   return (
     <div className="mx-auto max-w-md p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-lg font-medium text-zinc-900">Your Marketplace Listings</h1>
+        <h1 className="text-lg font-medium text-ink">Your Marketplace Listings</h1>
       </div>
 
       <button
         onClick={() => router.push("/staff/marketplace/new")}
-        className="mb-4 w-full rounded bg-zinc-900 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+        className="mb-4 w-full rounded bg-plum py-2 text-sm font-medium text-white hover:bg-plum-dark"
       >
         + Add Listing
       </button>
 
-      {fetching && <p className="text-sm text-zinc-500">Loading...</p>}
+      {fetching && <p className="text-sm text-muted">Loading...</p>}
 
       <ul className="space-y-3">
         {listings.map((l) => (
-          <li key={l.id} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
-            <p className="font-medium text-zinc-900">{l.itemName}</p>
-            <p className="text-sm text-zinc-500">{l.price}</p>
-            <p className="text-sm text-zinc-600">{l.description}</p>
+          <li key={l.id} className="rounded-lg border border-border-soft bg-card p-4 shadow-sm">
+            <p className="font-medium text-ink">{l.itemName}</p>
+            <p className="text-sm text-muted">{l.price}</p>
+            <p className="text-sm text-muted">{l.description}</p>
           </li>
         ))}
       </ul>

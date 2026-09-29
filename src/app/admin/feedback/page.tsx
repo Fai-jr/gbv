@@ -55,31 +55,31 @@ export default function AdminFeedbackPage() {
 
   return (
     <div className="mx-auto max-w-md p-6">
-      <h1 className="mb-1 text-lg font-medium text-zinc-900">Feedback Statistics</h1>
-      <p className="mb-6 text-sm text-zinc-600">
+      <h1 className="mb-1 text-lg font-medium text-ink">Feedback Statistics</h1>
+      <p className="mb-6 text-sm text-muted">
         Totals only. Individual responses are not identifiable and cannot be
         viewed here.
       </p>
 
-      {fetching && <p className="text-sm text-zinc-500">Loading...</p>}
+      {fetching && <p className="text-sm text-muted">Loading...</p>}
 
       {!fetching && counts && (
         <div className="space-y-3">
-          <div className="rounded-lg border border-zinc-200 bg-white p-4">
-            <p className="text-sm text-zinc-500">Total responses</p>
-            <p className="text-2xl font-semibold text-zinc-900">{counts.total}</p>
+          <div className="rounded-lg border border-border-soft bg-card p-4">
+            <p className="text-sm text-muted">Total responses</p>
+            <p className="text-2xl font-semibold text-ink">{counts.total}</p>
           </div>
 
-          <div className="rounded-lg border border-zinc-200 bg-white p-4">
-            <p className="mb-2 text-sm font-medium text-zinc-900">Reached the contact?</p>
-            <p className="text-sm text-zinc-700">Yes: {counts.reachedYes}</p>
-            <p className="text-sm text-zinc-700">No: {counts.reachedNo}</p>
+          <div className="rounded-lg border border-border-soft bg-card p-4">
+            <p className="mb-2 text-sm font-medium text-ink">Reached the contact?</p>
+            <p className="text-sm text-ink">Yes: {counts.reachedYes}</p>
+            <p className="text-sm text-ink">No: {counts.reachedNo}</p>
           </div>
 
-          <div className="rounded-lg border border-zinc-200 bg-white p-4">
-            <p className="mb-2 text-sm font-medium text-zinc-900">Was helped?</p>
-            <p className="text-sm text-zinc-700">Yes: {counts.helpedYes}</p>
-            <p className="text-sm text-zinc-700">No: {counts.helpedNo}</p>
+          <div className="rounded-lg border border-border-soft bg-card p-4">
+            <p className="mb-2 text-sm font-medium text-ink">Was helped?</p>
+            <p className="text-sm text-ink">Yes: {counts.helpedYes}</p>
+            <p className="text-sm text-ink">No: {counts.helpedNo}</p>
           </div>
         </div>
       )}

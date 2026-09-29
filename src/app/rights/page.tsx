@@ -24,17 +24,17 @@ export default function RightsPage() {
 
   return (
     <div className="mx-auto max-w-2xl p-6">
-      <h1 className="mb-2 text-xl font-semibold text-zinc-900">Know Your Rights</h1>
-      <p className="mb-6 text-sm text-zinc-600">
+      <h1 className="mb-2 text-xl font-semibold text-ink">Know Your Rights</h1>
+      <p className="mb-6 text-sm text-muted">
         This is general information, not legal advice. For guidance about your
         own situation, a legal advisor can help - see the contacts page.
       </p>
 
       <div className="space-y-4">
         {faqs.map((item, i) => (
-          <div key={i} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
-            <p className="font-medium text-zinc-900">{item.q}</p>
-            <p className="mt-1 text-sm text-zinc-600">{item.a}</p>
+          <div key={i} className="rounded-lg border border-border-soft bg-card p-4 shadow-sm">
+            <p className="font-medium text-ink">{item.q}</p>
+            <p className="mt-1 text-sm text-muted">{item.a}</p>
           </div>
         ))}
       </div>

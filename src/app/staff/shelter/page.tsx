@@ -75,34 +75,34 @@ export default function ShelterCapacityPage() {
 
   return (
     <div className="mx-auto max-w-md p-6">
-      <h1 className="mb-4 text-lg font-medium text-zinc-900">Your Shelters</h1>
+      <h1 className="mb-4 text-lg font-medium text-ink">Your Shelters</h1>
 
       <div className="mb-6 flex gap-2">
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="New shelter name"
-          className="flex-1 rounded border border-zinc-300 px-3 py-2 text-sm"
+          className="flex-1 rounded border border-border-soft px-3 py-2 text-sm"
         />
         <button
           onClick={addShelter}
           disabled={saving || !name.trim()}
-          className="rounded bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+          className="rounded bg-plum px-4 py-2 text-sm font-medium text-white hover:bg-plum-dark disabled:opacity-50"
         >
           Add
         </button>
       </div>
 
       {shelters.length === 0 && (
-        <p className="text-sm text-zinc-500">No shelters added yet.</p>
+        <p className="text-sm text-muted">No shelters added yet.</p>
       )}
 
       <ul className="space-y-3">
         {shelters.map((shelter) => {
           const isAvailable = shelter.capacityStatus === "available";
           return (
-            <li key={shelter.id} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
-              <p className="mb-2 font-medium text-zinc-900">{shelter.name}</p>
+            <li key={shelter.id} className="rounded-lg border border-border-soft bg-card p-4 shadow-sm">
+              <p className="mb-2 font-medium text-ink">{shelter.name}</p>
               <div
                 className={
                   "mb-3 rounded py-2 text-center text-sm font-semibold " +
@@ -114,7 +114,7 @@ export default function ShelterCapacityPage() {
               <button
                 onClick={() => toggleStatus(shelter)}
                 disabled={saving}
-                className="w-full rounded bg-zinc-900 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+                className="w-full rounded bg-plum py-2 text-sm font-medium text-white hover:bg-plum-dark disabled:opacity-50"
               >
                 Mark as {isAvailable ? "Full" : "Available"}
               </button>

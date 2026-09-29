@@ -117,35 +117,35 @@ export default function AdminServicesPage() {
 
   return (
     <div className="mx-auto max-w-md p-6">
-      <h1 className="mb-1 text-lg font-medium text-zinc-900">Verified Contacts</h1>
-      <p className="mb-4 text-sm text-zinc-600">
+      <h1 className="mb-1 text-lg font-medium text-ink">Verified Contacts</h1>
+      <p className="mb-4 text-sm text-muted">
         Only add a contact after you have called the number and confirmed it works.
         Saving records the date and who verified it.
       </p>
 
-      <form onSubmit={handleSubmit} className="mb-6 flex flex-col gap-3 rounded-lg border border-zinc-200 bg-white p-4">
-        <p className="text-sm font-medium text-zinc-900">
+      <form onSubmit={handleSubmit} className="mb-6 flex flex-col gap-3 rounded-lg border border-border-soft bg-card p-4">
+        <p className="text-sm font-medium text-ink">
           {editingId ? "Edit contact" : "Add a contact"}
         </p>
 
         <div>
-          <label htmlFor="svc-name" className="mb-1 block text-sm text-zinc-600">Name</label>
+          <label htmlFor="svc-name" className="mb-1 block text-sm text-muted">Name</label>
           <input
             id="svc-name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded border border-zinc-300 px-3 py-2 text-sm"
+            className="w-full rounded border border-border-soft px-3 py-2 text-sm"
             required
           />
         </div>
 
         <div>
-          <label htmlFor="svc-type" className="mb-1 block text-sm text-zinc-600">Type</label>
+          <label htmlFor="svc-type" className="mb-1 block text-sm text-muted">Type</label>
           <select
             id="svc-type"
             value={type}
             onChange={(e) => setType(e.target.value)}
-            className="w-full rounded border border-zinc-300 px-3 py-2 text-sm"
+            className="w-full rounded border border-border-soft px-3 py-2 text-sm"
           >
             {TYPES.map((t) => (
               <option key={t} value={t}>
@@ -156,23 +156,23 @@ export default function AdminServicesPage() {
         </div>
 
         <div>
-          <label htmlFor="svc-phone" className="mb-1 block text-sm text-zinc-600">Phone (with country code)</label>
+          <label htmlFor="svc-phone" className="mb-1 block text-sm text-muted">Phone (with country code)</label>
           <input
             id="svc-phone"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="w-full rounded border border-zinc-300 px-3 py-2 text-sm"
+            className="w-full rounded border border-border-soft px-3 py-2 text-sm"
             required
           />
         </div>
 
         <div>
-          <label htmlFor="svc-region" className="mb-1 block text-sm text-zinc-600">Region</label>
+          <label htmlFor="svc-region" className="mb-1 block text-sm text-muted">Region</label>
           <input
             id="svc-region"
             value={region}
             onChange={(e) => setRegion(e.target.value)}
-            className="w-full rounded border border-zinc-300 px-3 py-2 text-sm"
+            className="w-full rounded border border-border-soft px-3 py-2 text-sm"
             required
           />
         </div>
@@ -185,7 +185,7 @@ export default function AdminServicesPage() {
           <button
             type="submit"
             disabled={saving}
-            className="flex-1 rounded bg-zinc-900 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+            className="flex-1 rounded bg-plum py-2 text-sm font-medium text-white hover:bg-plum-dark disabled:opacity-50"
           >
             {saving ? "Saving..." : editingId ? "Save changes" : "Add contact"}
           </button>
@@ -193,33 +193,33 @@ export default function AdminServicesPage() {
             <button
               type="button"
               onClick={resetForm}
-              className="rounded bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-200"
+              className="rounded bg-tint px-4 py-2 text-sm font-medium text-ink hover:bg-tint-hover"
             >
               Cancel
             </button>
           )}
         </div>
 
-        {message && <p className="text-sm text-zinc-700">{message}</p>}
+        {message && <p className="text-sm text-ink">{message}</p>}
       </form>
 
-      {fetching && <p className="text-sm text-zinc-500">Loading...</p>}
+      {fetching && <p className="text-sm text-muted">Loading...</p>}
       {!fetching && services.length === 0 && (
-        <p className="text-sm text-zinc-500">No contacts yet.</p>
+        <p className="text-sm text-muted">No contacts yet.</p>
       )}
 
       <ul className="space-y-3">
         {services.map((s) => (
-          <li key={s.id} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
-            <p className="font-medium text-zinc-900">{s.name}</p>
-            <p className="text-sm text-zinc-500">
+          <li key={s.id} className="rounded-lg border border-border-soft bg-card p-4 shadow-sm">
+            <p className="font-medium text-ink">{s.name}</p>
+            <p className="text-sm text-muted">
               {s.type} - {s.region}
             </p>
-            <p className="text-sm text-zinc-700">{s.phone}</p>
+            <p className="text-sm text-ink">{s.phone}</p>
             <div className="mt-3 flex gap-2">
               <button
                 onClick={() => startEdit(s)}
-                className="rounded bg-zinc-100 px-3 py-1 text-sm text-zinc-700 hover:bg-zinc-200"
+                className="rounded bg-tint px-3 py-1 text-sm text-ink hover:bg-tint-hover"
               >
                 Edit
               </button>

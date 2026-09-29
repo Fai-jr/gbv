@@ -51,7 +51,7 @@ export default function ContactsPage() {
 
   return (
     <div className="mx-auto max-w-2xl p-6">
-      <h1 className="mb-4 text-xl font-semibold text-zinc-900">
+      <h1 className="mb-4 text-xl font-semibold text-ink">
         Verified Contacts
       </h1>
 
@@ -63,8 +63,8 @@ export default function ContactsPage() {
             className={
               "rounded-full px-3 py-1 text-sm capitalize " +
               (activeFilter === f
-                ? "bg-zinc-900 text-white"
-                : "bg-zinc-100 text-zinc-700")
+                ? "bg-plum text-white"
+                : "bg-tint text-ink")
             }
           >
             {f}
@@ -72,11 +72,11 @@ export default function ContactsPage() {
         ))}
       </div>
 
-      {loading && <p className="text-sm text-zinc-500">Loading...</p>}
+      {loading && <p className="text-sm text-muted">Loading...</p>}
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       {!loading && !error && filtered.length === 0 && (
-        <p className="text-sm text-zinc-500">No contacts in this category yet.</p>
+        <p className="text-sm text-muted">No contacts in this category yet.</p>
       )}
 
       <ul className="space-y-3">
@@ -85,13 +85,13 @@ export default function ContactsPage() {
           return (
             <li
               key={service.id}
-              className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm"
+              className="rounded-lg border border-border-soft bg-card p-4 shadow-sm"
             >
-              <p className="font-medium text-zinc-900">{service.name}</p>
-              <p className="text-sm text-zinc-500">
+              <p className="font-medium text-ink">{service.name}</p>
+              <p className="text-sm text-muted">
                 {service.type} - {service.region}
               </p>
-              <a href={callLink} className="mt-2 inline-block text-sm font-medium text-blue-600">
+              <a href={callLink} className="mt-2 inline-block text-sm font-medium text-plum">
                 Call {service.phone}
               </a>
             </li>

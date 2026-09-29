@@ -36,8 +36,8 @@ export default function StaffSignupPage() {
   if (done) {
     return (
       <div className="mx-auto max-w-sm p-6 text-center">
-        <h1 className="mb-3 text-lg font-medium text-zinc-900">Request sent</h1>
-        <p className="text-sm text-zinc-600">
+        <h1 className="mb-3 text-lg font-medium text-ink">Request sent</h1>
+        <p className="text-sm text-muted">
           Your account has been created. An administrator needs to approve it
           before you can access staff features. You will be able to sign in
           once that is done.
@@ -47,27 +47,27 @@ export default function StaffSignupPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
-      <form onSubmit={handleSubmit} className="w-full max-w-sm rounded-lg bg-white p-6 shadow">
-        <h1 className="mb-4 text-xl font-semibold text-zinc-900">Request Staff Access</h1>
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <form onSubmit={handleSubmit} className="w-full max-w-sm rounded-lg bg-card p-6 shadow">
+        <h1 className="mb-4 text-xl font-semibold text-ink">Request Staff Access</h1>
 
-        <label htmlFor="su-email" className="mb-1 block text-sm text-zinc-600">Email</label>
+        <label htmlFor="su-email" className="mb-1 block text-sm text-muted">Email</label>
         <input
           id="su-email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mb-3 w-full rounded border border-zinc-300 px-3 py-2 text-sm"
+          className="mb-3 w-full rounded border border-border-soft px-3 py-2 text-sm"
           required
         />
 
-        <label htmlFor="su-password" className="mb-1 block text-sm text-zinc-600">Password</label>
+        <label htmlFor="su-password" className="mb-1 block text-sm text-muted">Password</label>
         <input
           id="su-password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mb-4 w-full rounded border border-zinc-300 px-3 py-2 text-sm"
+          className="mb-4 w-full rounded border border-border-soft px-3 py-2 text-sm"
           required
           minLength={6}
         />
@@ -77,14 +77,14 @@ export default function StaffSignupPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded bg-zinc-900 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+          className="w-full rounded bg-plum py-2 text-sm font-medium text-white hover:bg-plum-dark disabled:opacity-50"
         >
           {loading ? "Creating account..." : "Create account"}
         </button>
 
-        <p className="mt-4 text-center text-sm text-zinc-500">
+        <p className="mt-4 text-center text-sm text-muted">
           Already approved?{" "}
-          <a href="/staff/login" className="text-blue-600 underline">
+          <a href="/staff/login" className="text-plum underline">
             Sign in
           </a>
         </p>

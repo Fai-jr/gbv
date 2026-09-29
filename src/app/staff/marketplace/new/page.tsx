@@ -47,34 +47,34 @@ export default function NewListingPage() {
 
   return (
     <div className="mx-auto max-w-md p-6">
-      <h1 className="mb-4 text-lg font-medium text-zinc-900">Add Listing</h1>
+      <h1 className="mb-4 text-lg font-medium text-ink">Add Listing</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <input
           value={itemName}
           onChange={(e) => setItemName(e.target.value)}
           placeholder="Item name"
-          className="rounded border border-zinc-300 px-3 py-2 text-sm"
+          className="rounded border border-border-soft px-3 py-2 text-sm"
           required
         />
         <input
           value={price}
           onChange={(e) => setPrice(e.target.value)}
           placeholder="Price (e.g. 3000 FCFA)"
-          className="rounded border border-zinc-300 px-3 py-2 text-sm"
+          className="rounded border border-border-soft px-3 py-2 text-sm"
           required
         />
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Short description"
-          className="rounded border border-zinc-300 px-3 py-2 text-sm"
+          className="rounded border border-border-soft px-3 py-2 text-sm"
           rows={3}
         />
         <input
           value={contactPhone}
           onChange={(e) => setContactPhone(e.target.value)}
           placeholder="Contact phone (organization number)"
-          className="rounded border border-zinc-300 px-3 py-2 text-sm"
+          className="rounded border border-border-soft px-3 py-2 text-sm"
           required
         />
 
@@ -85,7 +85,7 @@ export default function NewListingPage() {
         <button
           type="submit"
           disabled={status === "saving"}
-          className="rounded bg-zinc-900 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+          className="rounded bg-plum py-2 text-sm font-medium text-white hover:bg-plum-dark disabled:opacity-50"
         >
           {status === "saving" ? "Saving..." : "Add Listing"}
         </button>

@@ -1,11 +1,11 @@
 {
-  "name": "GBV Support",
-  "short_name": "Support",
-  "description": "Access verified support contacts and resources.",
+  "name": "GBVConnect",
+  "short_name": "GBVConnect",
+  "description": "Connects survivors to services.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#18181b",
+  "background_color": "#FAF3E8",
+  "theme_color": "#4A3B52",
   "icons": [
     {
       "src": "/next.svg",

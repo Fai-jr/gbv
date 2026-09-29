@@ -244,29 +244,29 @@ export default function SupportChatPage() {
   if (ended) {
     return (
       <div className="mx-auto max-w-md p-6 text-center">
-        <h1 className="mb-4 text-lg font-medium text-zinc-900">
+        <h1 className="mb-4 text-lg font-medium text-ink">
           Take care of yourself
         </h1>
-        <p className="mb-6 text-sm text-zinc-600">
+        <p className="mb-6 text-sm text-muted">
           Thank you for talking with me. Whenever you&apos;re ready, here are
           some people who can help.
         </p>
         <div className="flex flex-col gap-3">
           <button
             onClick={() => router.push("/contacts")}
-            className="rounded-lg bg-zinc-900 py-3 text-sm font-medium text-white hover:bg-zinc-800"
+            className="rounded-lg bg-plum py-3 text-sm font-medium text-white hover:bg-plum-dark"
           >
             See support contacts
           </button>
           <button
             onClick={() => router.push("/refuge")}
-            className="rounded-lg bg-zinc-100 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-200"
+            className="rounded-lg bg-tint py-3 text-sm font-medium text-ink hover:bg-tint-hover"
           >
             Find a safe place
           </button>
           <button
             onClick={() => router.push("/help")}
-            className="rounded-lg bg-red-600 py-3 text-sm font-medium text-white hover:bg-red-700"
+            className="rounded-lg bg-danger py-3 text-sm font-medium text-white hover:bg-danger-dark"
           >
             I need help now
           </button>
@@ -277,7 +277,7 @@ export default function SupportChatPage() {
 
   return (
     <div className="mx-auto flex max-w-md flex-col p-6">
-      <h1 className="mb-4 text-lg font-medium text-zinc-900">Let&apos;s Talk</h1>
+      <h1 className="mb-4 text-lg font-medium text-ink">Let&apos;s Talk</h1>
 
       {concernNoticed && (
         <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
@@ -302,8 +302,8 @@ export default function SupportChatPage() {
             className={
               "max-w-[80%] rounded-lg px-3 py-2 text-sm " +
               (m.sender === "bot"
-                ? "self-start bg-zinc-100 text-zinc-800"
-                : "self-end bg-zinc-900 text-white")
+                ? "self-start bg-tint text-ink"
+                : "self-end bg-plum text-white")
             }
           >
             {m.text}
@@ -317,13 +317,13 @@ export default function SupportChatPage() {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
           placeholder="Type or use the mic..."
-          className="flex-1 rounded border border-zinc-300 px-3 py-2 text-sm"
+          className="flex-1 rounded border border-border-soft px-3 py-2 text-sm"
         />
         <button
           onClick={toggleListening}
           className={
             "rounded px-3 py-2 text-sm font-medium " +
-            (listening ? "bg-red-600 text-white" : "bg-zinc-200 text-zinc-700")
+            (listening ? "bg-danger text-white" : "bg-zinc-200 text-ink")
           }
           title="Voice input"
         >
@@ -331,7 +331,7 @@ export default function SupportChatPage() {
         </button>
         <button
           onClick={() => handleSend()}
-          className="rounded bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+          className="rounded bg-plum px-4 py-2 text-sm font-medium text-white hover:bg-plum-dark"
         >
           Send
         </button>
@@ -339,7 +339,7 @@ export default function SupportChatPage() {
 
       <button
         onClick={() => setEnded(true)}
-        className="mt-4 text-sm text-zinc-500 underline"
+        className="mt-4 text-sm text-muted underline"
       >
         I&apos;m done talking
       </button>

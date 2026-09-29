@@ -27,17 +27,17 @@ export default function HelpPage() {
 
   return (
     <div className="mx-auto max-w-md p-6 text-center">
-      <h1 className="mb-2 text-lg font-medium text-zinc-900">
+      <h1 className="mb-2 text-lg font-medium text-ink">
         Get Help
       </h1>
-      <p className="mb-6 text-sm text-zinc-600">
+      <p className="mb-6 text-sm text-muted">
         Tap the button below if you need help right now.
       </p>
 
       <button
         onClick={handleAlert}
         disabled={authLoading || status === "sending" || status === "sent"}
-        className="w-full rounded-lg bg-red-600 py-3 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+        className="w-full rounded-lg bg-danger py-3 text-sm font-medium text-white hover:bg-danger-dark disabled:opacity-50"
       >
         {status === "sending" ? "Sending..." : "I need help now"}
       </button>

@@ -39,9 +39,9 @@ export default function QuickExit() {
       onClick={exitNow}
       aria-label="Quick exit"
       title="If someone might check your browsing history, use private/incognito browsing for full protection."
-      className="fixed top-3 right-3 z-50 rounded-full bg-white px-3 py-1 text-xs font-medium text-zinc-500 shadow border border-zinc-200 hover:bg-zinc-100"
+      className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-center border-t border-border-soft bg-card py-3 text-sm font-medium text-muted hover:bg-tint"
     >
-      X
+      Close
     </button>
   );
 }

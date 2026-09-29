@@ -28,24 +28,24 @@ export default function HelpSomeonePage() {
 
   return (
     <div className="mx-auto max-w-2xl p-6">
-      <h1 className="mb-2 text-xl font-semibold text-zinc-900">
+      <h1 className="mb-2 text-xl font-semibold text-ink">
         Supporting Someone Else
       </h1>
-      <p className="mb-6 text-sm text-zinc-600">
+      <p className="mb-6 text-sm text-muted">
         If someone you know may be experiencing gender-based violence, here
         is how you can help.
       </p>
 
       <div className="space-y-4">
         {tips.map((tip, i) => (
-          <div key={i} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
-            <p className="font-medium text-zinc-900">{tip.title}</p>
-            <p className="mt-1 text-sm text-zinc-600">{tip.body}</p>
+          <div key={i} className="rounded-lg border border-border-soft bg-card p-4 shadow-sm">
+            <p className="font-medium text-ink">{tip.title}</p>
+            <p className="mt-1 text-sm text-muted">{tip.body}</p>
           </div>
         ))}
       </div>
 
-      <a href="/contacts" className="mt-6 inline-block rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800">
+      <a href="/contacts" className="mt-6 inline-block rounded-lg bg-plum px-4 py-2 text-sm font-medium text-white hover:bg-plum-dark">
         See contacts you can share with her
       </a>
     </div>

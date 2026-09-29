@@ -27,28 +27,28 @@ export default function StaffLoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm rounded-lg bg-white p-6 shadow"
+        className="w-full max-w-sm rounded-lg bg-card p-6 shadow"
       >
-        <h1 className="mb-4 text-xl font-semibold text-zinc-900">Staff Login</h1>
+        <h1 className="mb-4 text-xl font-semibold text-ink">Staff Login</h1>
 
-        <label className="mb-1 block text-sm text-zinc-600">Email</label>
+        <label className="mb-1 block text-sm text-muted">Email</label>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mb-3 w-full rounded border border-zinc-300 px-3 py-2 text-sm"
+          className="mb-3 w-full rounded border border-border-soft px-3 py-2 text-sm"
           required
         />
 
-        <label className="mb-1 block text-sm text-zinc-600">Password</label>
+        <label className="mb-1 block text-sm text-muted">Password</label>
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mb-4 w-full rounded border border-zinc-300 px-3 py-2 text-sm"
+          className="mb-4 w-full rounded border border-border-soft px-3 py-2 text-sm"
           required
         />
 
@@ -57,7 +57,7 @@ export default function StaffLoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded bg-zinc-900 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+          className="w-full rounded bg-plum py-2 text-sm font-medium text-white hover:bg-plum-dark disabled:opacity-50"
         >
           {loading ? "Signing in..." : "Sign in"}
         </button>

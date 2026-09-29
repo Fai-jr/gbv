@@ -1,33 +1,24 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/500.css";
+import "@fontsource/inter/600.css";
+import "@fontsource/lora/500.css";
+import "@fontsource/lora/600.css";
 import "./globals.css";
 import { AuthProvider } from "@/lib/AuthContext";
 import QuickExit from "@/components/QuickExit";
 import RegisterSW from "@/components/RegisterSW";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "Support",
-  description: "Access verified support contacts and resources.",
+  title: "GBVConnect",
+  description: "Connects survivors to services.",
   manifest: "/manifest.json",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">
+    <html lang="en" className="h-full antialiased">
+      <body className="min-h-full flex flex-col pb-14">
         <AuthProvider>
           <RegisterSW />
           <QuickExit />

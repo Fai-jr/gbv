@@ -71,18 +71,18 @@ export default function NewCasePage() {
 
   return (
     <div className="mx-auto max-w-md p-6">
-      <h1 className="mb-4 text-lg font-medium text-zinc-900">New Case</h1>
+      <h1 className="mb-4 text-lg font-medium text-ink">New Case</h1>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
-          <label htmlFor="incidentType" className="mb-1 block text-sm text-zinc-600">
+          <label htmlFor="incidentType" className="mb-1 block text-sm text-muted">
             Type of incident
           </label>
           <select
             id="incidentType"
             value={incidentType}
             onChange={(e) => setIncidentType(e.target.value)}
-            className="w-full rounded border border-zinc-300 px-3 py-2 text-sm"
+            className="w-full rounded border border-border-soft px-3 py-2 text-sm"
           >
             {INCIDENT_TYPES.map((t) => (
               <option key={t} value={t}>
@@ -93,14 +93,14 @@ export default function NewCasePage() {
         </div>
 
         <div>
-          <label htmlFor="ageGroup" className="mb-1 block text-sm text-zinc-600">
+          <label htmlFor="ageGroup" className="mb-1 block text-sm text-muted">
             Age group
           </label>
           <select
             id="ageGroup"
             value={ageGroup}
             onChange={(e) => setAgeGroup(e.target.value)}
-            className="w-full rounded border border-zinc-300 px-3 py-2 text-sm"
+            className="w-full rounded border border-border-soft px-3 py-2 text-sm"
           >
             <option value="18 or over">18 or over</option>
             <option value="under 18">Under 18</option>
@@ -108,7 +108,7 @@ export default function NewCasePage() {
         </div>
 
         <fieldset>
-          <legend className="mb-1 text-sm text-zinc-600">Services provided</legend>
+          <legend className="mb-1 text-sm text-muted">Services provided</legend>
           <div className="flex flex-wrap gap-2">
             {SERVICES.map((s) => (
               <button
@@ -118,8 +118,8 @@ export default function NewCasePage() {
                 className={
                   "rounded-full px-3 py-1 text-sm " +
                   (services.includes(s)
-                    ? "bg-zinc-900 text-white"
-                    : "bg-zinc-100 text-zinc-700")
+                    ? "bg-plum text-white"
+                    : "bg-tint text-ink")
                 }
               >
                 {s}
@@ -129,7 +129,7 @@ export default function NewCasePage() {
         </fieldset>
 
         <div>
-          <label htmlFor="notes" className="mb-1 block text-sm text-zinc-600">
+          <label htmlFor="notes" className="mb-1 block text-sm text-muted">
             Notes
           </label>
           <textarea
@@ -137,7 +137,7 @@ export default function NewCasePage() {
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={4}
-            className="w-full rounded border border-zinc-300 px-3 py-2 text-sm"
+            className="w-full rounded border border-border-soft px-3 py-2 text-sm"
           />
           <p className="mt-1 text-xs text-amber-700">
             Do not enter names, phone numbers, addresses or anything that could
@@ -145,7 +145,7 @@ export default function NewCasePage() {
           </p>
         </div>
 
-        <label className="flex items-start gap-2 text-sm text-zinc-700">
+        <label className="flex items-start gap-2 text-sm text-ink">
           <input
             type="checkbox"
             checked={consent}
@@ -165,7 +165,7 @@ export default function NewCasePage() {
         <button
           type="submit"
           disabled={!consent || status === "saving"}
-          className="rounded bg-zinc-900 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+          className="rounded bg-plum py-2 text-sm font-medium text-white hover:bg-plum-dark disabled:opacity-50"
         >
           {status === "saving" ? "Saving..." : "Save case"}
         </button>

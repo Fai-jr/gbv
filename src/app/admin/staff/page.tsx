@@ -83,28 +83,28 @@ export default function AdminStaffPage() {
 
   return (
     <div className="mx-auto max-w-md p-6">
-      <h1 className="mb-4 text-lg font-medium text-zinc-900">Staff Accounts</h1>
+      <h1 className="mb-4 text-lg font-medium text-ink">Staff Accounts</h1>
 
-      <h2 className="mb-2 text-sm font-medium text-zinc-700">Pending requests</h2>
-      {fetching && <p className="text-sm text-zinc-500">Loading...</p>}
+      <h2 className="mb-2 text-sm font-medium text-ink">Pending requests</h2>
+      {fetching && <p className="text-sm text-muted">Loading...</p>}
       {!fetching && pending.length === 0 && (
-        <p className="mb-4 text-sm text-zinc-500">No pending requests.</p>
+        <p className="mb-4 text-sm text-muted">No pending requests.</p>
       )}
       <ul className="mb-6 space-y-3">
         {pending.map((u) => {
           const sel = selections[u.id] ?? { role: "ngo_staff", orgId: "" };
           return (
-            <li key={u.id} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
-              <p className="text-sm font-medium text-zinc-900">{u.email}</p>
+            <li key={u.id} className="rounded-lg border border-border-soft bg-card p-4 shadow-sm">
+              <p className="text-sm font-medium text-ink">{u.email}</p>
 
-              <label htmlFor={"role-" + u.id} className="mt-2 block text-xs text-zinc-500">
+              <label htmlFor={"role-" + u.id} className="mt-2 block text-xs text-muted">
                 Assign role
               </label>
               <select
                 id={"role-" + u.id}
                 value={sel.role}
                 onChange={(e) => updateSelection(u.id, "role", e.target.value)}
-                className="mt-1 w-full rounded border border-zinc-300 px-2 py-1 text-sm"
+                className="mt-1 w-full rounded border border-border-soft px-2 py-1 text-sm"
               >
                 {ASSIGNABLE_ROLES.map((r) => (
                   <option key={r} value={r}>
@@ -115,7 +115,7 @@ export default function AdminStaffPage() {
 
               {sel.role !== "admin" && (
                 <>
-                  <label htmlFor={"org-" + u.id} className="mt-2 block text-xs text-zinc-500">
+                  <label htmlFor={"org-" + u.id} className="mt-2 block text-xs text-muted">
                     Organisation ID
                   </label>
                   <input
@@ -123,7 +123,7 @@ export default function AdminStaffPage() {
                     value={sel.orgId}
                     onChange={(e) => updateSelection(u.id, "orgId", e.target.value)}
                     placeholder="e.g. alvf-yaounde"
-                    className="mt-1 w-full rounded border border-zinc-300 px-2 py-1 text-sm"
+                    className="mt-1 w-full rounded border border-border-soft px-2 py-1 text-sm"
                   />
                 </>
               )}
@@ -131,7 +131,7 @@ export default function AdminStaffPage() {
               <button
                 onClick={() => approve(u)}
                 disabled={saving === u.id}
-                className="mt-3 w-full rounded bg-zinc-900 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+                className="mt-3 w-full rounded bg-plum py-2 text-sm font-medium text-white hover:bg-plum-dark disabled:opacity-50"
               >
                 {saving === u.id ? "Saving..." : "Approve"}
               </button>
@@ -140,15 +140,15 @@ export default function AdminStaffPage() {
         })}
       </ul>
 
-      <h2 className="mb-2 text-sm font-medium text-zinc-700">Approved staff</h2>
+      <h2 className="mb-2 text-sm font-medium text-ink">Approved staff</h2>
       {!fetching && approved.length === 0 && (
-        <p className="text-sm text-zinc-500">No approved staff yet.</p>
+        <p className="text-sm text-muted">No approved staff yet.</p>
       )}
       <ul className="space-y-2">
         {approved.map((u) => (
-          <li key={u.id} className="rounded-lg border border-zinc-200 bg-white p-3 text-sm">
-            <p className="font-medium text-zinc-900">{u.email}</p>
-            <p className="text-zinc-500">
+          <li key={u.id} className="rounded-lg border border-border-soft bg-card p-3 text-sm">
+            <p className="font-medium text-ink">{u.email}</p>
+            <p className="text-muted">
               {u.role}
               {u.orgId ? " - " + u.orgId : ""}
             </p>
