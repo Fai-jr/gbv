@@ -1,29 +1,98 @@
 @import "tailwindcss";
 
 :root {
-  --background: #FAF3E8;
+  --background: #fff8ef;
 }
 
 @theme inline {
-  --color-background: #FAF3E8;
-  --color-card: #FFFFFF;
+  --color-surface: #fff8ef;
+  --color-surface-dim: #e0d9cf;
+  --color-surface-bright: #fff8ef;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #faf3e8;
+  --color-surface-container: #f4ede2;
+  --color-surface-container-high: #eee7dc;
+  --color-surface-container-highest: #e8e2d7;
+  --color-on-surface: #1e1b15;
+  --color-on-surface-variant: #4a454b;
+  --color-inverse-surface: #333029;
+  --color-inverse-on-surface: #f7f0e5;
+  --color-outline: #7c757c;
+  --color-outline-variant: #ccc4cc;
+  --color-surface-tint: #695871;
+
+  --color-primary: #33253b;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #4a3b52;
+  --color-on-primary-container: #baa6c1;
+  --color-inverse-primary: #d4bfdc;
+  --color-primary-fixed: #f1dbf9;
+  --color-primary-fixed-dim: #d4bfdc;
+  --color-on-primary-fixed: #23162b;
+  --color-on-primary-fixed-variant: #504158;
+
+  --color-secondary: #b4271f;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #fe5c4c;
+  --color-on-secondary-container: #610002;
+  --color-secondary-fixed: #ffdad5;
+  --color-secondary-fixed-dim: #ffb4aa;
+  --color-on-secondary-fixed: #410001;
+  --color-on-secondary-fixed-variant: #910809;
+
+  --color-tertiary: #665f3d;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #b4ab84;
+  --color-on-tertiary-container: #453f20;
+  --color-tertiary-fixed: #ede3b8;
+  --color-tertiary-fixed-dim: #d1c79d;
+  --color-on-tertiary-fixed: #201c02;
+  --color-on-tertiary-fixed-variant: #4d4727;
+
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+
+  --color-background: #fff8ef;
+  --color-on-background: #1e1b15;
+  --color-surface-variant: #e8e2d7;
+
+  --color-card: #ffffff;
   --color-ink: #292524;
-  --color-muted: #6B6560;
-  --color-border-soft: #E7E1D8;
-  --color-plum: #4A3B52;
-  --color-plum-dark: #3A2E40;
-  --color-tint: #EFE6E9;
-  --color-tint-hover: #E3D7DE;
-  --color-danger: #B3261E;
-  --color-danger-dark: #8F1E18;
+  --color-muted: #6b6560;
+  --color-border-soft: #e7e1d8;
+  --color-plum: #4a3b52;
+  --color-plum-dark: #3a2e40;
+  --color-tint: #efe6e9;
+  --color-tint-hover: #e3d7de;
+  --color-danger: #b3261e;
+  --color-danger-dark: #8f1e18;
+
+  --color-notice-bg: #fef3c7;
+  --color-notice-text: #92400e;
+  --color-available-bg: #dcfce7;
+  --color-available-border: #bbf7d0;
+  --color-available-text: #166534;
+  --color-full-bg: #fee2e2;
+  --color-full-border: #fecaca;
+  --color-full-text: #991b1b;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  --font-headline: "Literata", serif;
+  --font-body: "Plus Jakarta Sans", sans-serif;
 }
 
 body {
   background: var(--background);
-  color: #292524;
-  font-family: "Inter", Arial, sans-serif;
+  color: #1e1b15;
+  font-family: var(--font-body);
 }
 
 h1, h2, h3 {
-  font-family: "Lora", serif;
+  font-family: var(--font-headline);
 }
