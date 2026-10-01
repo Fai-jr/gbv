@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Shield, User, Lock } from "lucide-react";
+import { safeExit } from "@/components/QuickExit";
 
 const NAV = [
   { label: "Home", href: "/" },
@@ -22,10 +23,10 @@ export default function SiteHeader({ active }: { active?: string }) {
             <img alt="GBVConnect logo" className="h-8 w-auto" src="/logo.svg" />
           </Link>
           <div className="flex items-center gap-3">
-<a href="https://www.google.com" rel="nofollow noopener noreferrer" title="Quick exit" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-high font-semibold text-sm transition-colors">
+<button type="button" onClick={safeExit} title="If someone might check your browsing history, use private/incognito browsing for full protection." className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-high font-semibold text-sm transition-colors">
               <Shield size={16} className="text-tertiary" />
               <span className="hidden sm:inline">Quick Exit</span>
-            </a>
+            </button>
             <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
               <User size={16} className="text-on-primary" />
             </div>
