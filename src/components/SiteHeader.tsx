@@ -12,6 +12,7 @@ const NAV = [
   { label: "Chat", href: "/support/chat" },
   { label: "Market", href: "/marketplace" },
   { label: "Rights", href: "/rights" },
+  { label: "For friends", href: "/help-someone" },
 ];
 
 export default function SiteHeader({ active }: { active?: string }) {
