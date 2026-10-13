@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { collection, doc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
 import StaffShell from "@/components/StaffShell";
+import AdminOverview from "@/components/AdminOverview";
 import {
   Home as HomeIcon,
   FolderOpen,
-  CircleCheck,
+  BedDouble,
   CircleSlash,
   Clock,
   Plus,
@@ -17,10 +18,15 @@ import {
   Store,
   GraduationCap,
   Info,
-  RefreshCw,
 } from "lucide-react";
 
-type Shelter = { id: string; name: string; capacityStatus: "available" | "full" };
+type Shelter = {
+  id: string;
+  name: string;
+  capacity?: number;
+  occupied?: number;
+  capacityStatus?: "available" | "full";
+};
 type CaseRow = {
   id: string;
   caseCode: string;
@@ -69,7 +75,6 @@ export default function StaffDashboard() {
   const [error, setError] = useState("");
 
   const orgId = profile?.orgId;
-  const canToggle = profile?.role === "shelter_staff" || profile?.role === "admin";
 
   useEffect(() => {
     if (loading) return;
@@ -96,21 +101,15 @@ export default function StaffDashboard() {
     load();
   }, [loading, orgId]);
 
-  async function toggle(s: Shelter) {
-    const next = s.capacityStatus === "available" ? "full" : "available";
-    try {
-      await updateDoc(doc(db, "shelters", s.id), { capacityStatus: next });
-      setShelters((prev) => prev.map((x) => (x.id === s.id ? { ...x, capacityStatus: next } : x)));
-    } catch (err) {
-      console.error("Could not update shelter:", err);
-      setError("Could not update that shelter. Please try again.");
-    }
-  }
-
-  const available = shelters.filter((s) => s.capacityStatus === "available").length;
+  const spacesLeft = shelters.reduce(
+    (sum, s) => (typeof s.capacity === "number" ? sum + Math.max(0, s.capacity - (s.occupied ?? 0)) : sum),
+    0
+  );
   const full = shelters.filter((s) => s.capacityStatus === "full").length;
   const openCases = cases.filter((c) => c.status === "open").length;
   const inProgress = cases.filter((c) => c.status === "in progress").length;
+
+  if (profile?.role === "admin") return <AdminOverview />;
 
   return (
     <StaffShell
@@ -141,7 +140,7 @@ export default function StaffDashboard() {
       {orgId && (
         <>
           <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard label="Shelters available" value={fetching ? "-" : available} note="Marked as taking people" tone="bg-available-bg text-available-text" icon={CircleCheck} />
+            <StatCard label="Spaces left" value={fetching ? "-" : spacesLeft} note="Across shelters with a set capacity" tone="bg-available-bg text-available-text" icon={BedDouble} />
             <StatCard label="Shelters full" value={fetching ? "-" : full} note="Not taking new arrivals" tone="bg-full-bg text-full-text" icon={CircleSlash} />
             <StatCard label="Open cases" value={fetching ? "-" : openCases} note="Waiting for first action" tone="bg-surface-container-lowest text-primary" icon={FolderOpen} />
             <StatCard label="In progress" value={fetching ? "-" : inProgress} note="Being actively supported" tone="bg-surface-container-lowest text-primary" icon={Clock} />
@@ -150,7 +149,7 @@ export default function StaffDashboard() {
           <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             <div className="lg:col-span-7 bg-surface-container-lowest rounded-xl shadow-sm p-6 flex flex-col gap-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-primary">Shelter availability</h2>
+                <h2 className="text-xl font-semibold text-primary">Shelter spaces</h2>
                 <Link href="/staff/shelter" className="text-sm font-semibold text-primary hover:underline">
                   Manage shelters
                 </Link>
@@ -163,36 +162,45 @@ export default function StaffDashboard() {
               )}
               <ul className="flex flex-col gap-3">
                 {shelters.map((s) => {
-                  const isAvailable = s.capacityStatus === "available";
+                  const hasNumbers = typeof s.capacity === "number";
+                  const cap = s.capacity ?? 0;
+                  const occ = s.occupied ?? 0;
+                  const left = Math.max(0, cap - occ);
+                  const percent = cap > 0 ? Math.min(100, Math.round((occ / cap) * 100)) : 0;
+                  const isFull = hasNumbers ? left === 0 : s.capacityStatus === "full";
                   return (
-                    <li key={s.id} className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-xl bg-surface-container-low">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-surface-container-lowest flex items-center justify-center text-primary shadow-sm">
-                          <HomeIcon size={20} />
+                    <li key={s.id} className="p-4 rounded-xl bg-surface-container-low flex flex-col gap-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-10 h-10 rounded-xl bg-surface-container-lowest flex items-center justify-center text-primary shadow-sm shrink-0">
+                            <HomeIcon size={20} />
+                          </div>
+                          <span className="font-semibold text-on-surface truncate">{s.name}</span>
                         </div>
-                        <span className="font-semibold text-on-surface">{s.name}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
                         <span
                           className={
-                            "px-3 py-1 rounded-full text-xs font-semibold border " +
-                            (isAvailable
-                              ? "bg-available-bg text-available-text border-available-border"
-                              : "bg-full-bg text-full-text border-full-border")
+                            "px-3 py-1 rounded-full text-xs font-semibold border shrink-0 " +
+                            (isFull
+                              ? "bg-full-bg text-full-text border-full-border"
+                              : "bg-available-bg text-available-text border-available-border")
                           }
                         >
-                          {isAvailable ? "Available" : "Full"}
+                          {hasNumbers ? (isFull ? "Full" : left + " left") : isFull ? "Full" : "Available"}
                         </span>
-                        {canToggle && (
-                          <button
-                            onClick={() => toggle(s)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-lowest text-primary text-sm font-semibold shadow-sm hover:bg-surface-container transition-colors"
-                          >
-                            <RefreshCw size={14} />
-                            Mark as {isAvailable ? "full" : "available"}
-                          </button>
-                        )}
                       </div>
+                      {hasNumbers ? (
+                        <div className="flex flex-col gap-1">
+                          <div className="h-2.5 rounded-full bg-surface-container overflow-hidden">
+                            <div
+                              className={"h-full rounded-full " + (isFull ? "bg-full-text" : percent >= 80 ? "bg-notice-text" : "bg-available-text")}
+                              style={{ width: percent + "%" }}
+                            />
+                          </div>
+                          <span className="text-xs text-on-surface-variant">{occ} of {cap} occupied</span>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-notice-text">Capacity not set yet. Open Manage shelters to set it.</span>
+                      )}
                     </li>
                   );
                 })}

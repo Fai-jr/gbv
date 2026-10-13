@@ -1,160 +1,379 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
+import { useEffect, useMemo, useState } from "react";
+import { collection, deleteField, doc, getDocs, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
+import StaffShell from "@/components/StaffShell";
+import { Check, X, Pencil, UserX, RotateCcw, Info } from "lucide-react";
 
-const ASSIGNABLE_ROLES = ["ngo_staff", "shelter_staff", "admin"];
+const ASSIGNABLE = ["ngo_staff", "shelter_staff", "admin"];
+const ROLE_LABEL: Record<string, string> = {
+  ngo_staff: "NGO staff",
+  shelter_staff: "Shelter staff",
+  admin: "Administrator",
+};
 
 type UserDoc = {
   id: string;
   role: string;
   email?: string;
   orgId?: string;
+  createdAt?: string;
+  revoked?: boolean;
+  revokedAt?: { seconds: number };
 };
 
+type Draft = { role: string; orgId: string };
+
+const inputClass =
+  "w-full h-[48px] rounded-xl border border-border-soft bg-card px-4 text-ink focus:outline-none focus:ring-2 focus:ring-primary-container";
+
+function normaliseOrg(v: string) {
+  return v.trim().toLowerCase().replace(/\s+/g, "-");
+}
+
+function nameOf(u: UserDoc) {
+  return u.email || "Account " + u.id.slice(0, 8);
+}
+
 export default function AdminStaffPage() {
-  const { profile, loading } = useAuth();
-  const router = useRouter();
+  const { user, profile, loading } = useAuth();
   const [users, setUsers] = useState<UserDoc[]>([]);
   const [fetching, setFetching] = useState(true);
-  const [selections, setSelections] = useState<Record<string, { role: string; orgId: string }>>({});
-  const [saving, setSaving] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!loading && (!profile || profile.role !== "admin")) {
-      router.replace("/staff/login");
-    }
-  }, [loading, profile, router]);
+  const [drafts, setDrafts] = useState<Record<string, Draft>>({});
+  const [editing, setEditing] = useState<string | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     if (loading || profile?.role !== "admin") return;
-
-    async function fetchUsers() {
-      const snap = await getDocs(collection(db, "users"));
-      const list = snap.docs
-        .map((d) => ({ id: d.id, ...(d.data() as Omit<UserDoc, "id">) }))
-        .filter((u) => !!u.email);
-      setUsers(list);
+    async function load() {
+      try {
+        const [staffSnap, emailSnap] = await Promise.all([
+          getDocs(query(collection(db, "users"), where("role", "!=", "survivor"))),
+          getDocs(query(collection(db, "users"), where("email", ">", ""))),
+        ]);
+        const map = new Map<string, UserDoc>();
+        [...staffSnap.docs, ...emailSnap.docs].forEach((d) =>
+          map.set(d.id, { id: d.id, ...(d.data() as Omit<UserDoc, "id">) })
+        );
+        setUsers(Array.from(map.values()));
+      } catch (err) {
+        console.error("Failed to load accounts:", err);
+        setError("Could not load accounts. Please refresh.");
+      }
       setFetching(false);
     }
-
-    fetchUsers();
+    load();
   }, [loading, profile]);
 
-  function updateSelection(uid: string, field: "role" | "orgId", value: string) {
-    setSelections((prev) => ({
-      ...prev,
-      [uid]: {
-        role: prev[uid]?.role ?? "ngo_staff",
-        orgId: prev[uid]?.orgId ?? "",
-        [field]: value,
-      },
-    }));
+  const pending = useMemo(() => users.filter((u) => u.role === "survivor" && u.email && !u.revoked), [users]);
+  const active = useMemo(
+    () => users.filter((u) => u.role !== "survivor").sort((a, b) => nameOf(a).localeCompare(nameOf(b))),
+    [users]
+  );
+  const former = useMemo(() => users.filter((u) => u.role === "survivor" && u.email && u.revoked), [users]);
+  const orgSuggestions = useMemo(
+    () => Array.from(new Set(active.map((u) => u.orgId).filter(Boolean) as string[])),
+    [active]
+  );
+
+  function draftFor(u: UserDoc): Draft {
+    return drafts[u.id] ?? { role: u.role !== "survivor" ? u.role : "ngo_staff", orgId: u.orgId ?? "" };
   }
 
-  async function approve(u: UserDoc) {
-    const sel = selections[u.id];
-    const role = sel?.role ?? "ngo_staff";
-    const orgId = sel?.orgId?.trim();
-    if (role !== "admin" && !orgId) {
-      alert("Please enter an organisation ID for this role.");
-      return;
+  function setDraft(u: UserDoc, field: keyof Draft, value: string) {
+    setDrafts((prev) => ({ ...prev, [u.id]: { ...draftFor(u), [field]: value } }));
+  }
+
+  function patchLocal(id: string, changes: Partial<UserDoc>) {
+    setUsers((prev) => prev.map((x) => (x.id === id ? { ...x, ...changes } : x)));
+  }
+
+  async function applyAccess(u: UserDoc) {
+    setError("");
+    setMessage("");
+    const d = draftFor(u);
+    const org = normaliseOrg(d.orgId);
+    if (d.role !== "admin") {
+      if (!org) {
+        setError("Please enter an organisation for this role.");
+        return;
+      }
+      if (!/^[a-z0-9-]+$/.test(org)) {
+        setError("Organisation names can only use letters, numbers and hyphens.");
+        return;
+      }
     }
-    setSaving(u.id);
+    setBusy(u.id);
     try {
-      const data: Record<string, string> = { role };
-      if (orgId) data.orgId = orgId;
-      await updateDoc(doc(db, "users", u.id), data);
-      setUsers((prev) => prev.map((x) => (x.id === u.id ? { ...x, role, orgId } : x)));
+      await updateDoc(doc(db, "users", u.id), {
+        role: d.role,
+        orgId: d.role === "admin" ? deleteField() : org,
+        revoked: deleteField(),
+        revokedAt: deleteField(),
+      });
+      patchLocal(u.id, {
+        role: d.role,
+        orgId: d.role === "admin" ? undefined : org,
+        revoked: undefined,
+        revokedAt: undefined,
+      });
+      setEditing(null);
+      setMessage(nameOf(u) + " now has access as " + ROLE_LABEL[d.role] + ".");
     } catch (err) {
-      console.error("Failed to update role:", err);
-      alert("Could not save. Please try again.");
+      console.error("Failed to update access:", err);
+      setError("Could not save. Please try again.");
     }
-    setSaving(null);
+    setBusy(null);
   }
 
-  if (loading || !profile) return <p className="p-8">Loading...</p>;
+  async function removeAccess(u: UserDoc) {
+    setError("");
+    setMessage("");
+    if (!window.confirm("Remove staff access for " + nameOf(u) + "? They will no longer be able to see any organisation data.")) return;
+    setBusy(u.id);
+    try {
+      await updateDoc(doc(db, "users", u.id), {
+        role: "survivor",
+        orgId: deleteField(),
+        revoked: true,
+        revokedAt: serverTimestamp(),
+      });
+      patchLocal(u.id, {
+        role: "survivor",
+        orgId: undefined,
+        revoked: true,
+        revokedAt: { seconds: Math.floor(Date.now() / 1000) },
+      });
+      setEditing(null);
+      setMessage("Access removed for " + nameOf(u) + ".");
+    } catch (err) {
+      console.error("Failed to remove access:", err);
+      setError("Could not remove access. Please try again.");
+    }
+    setBusy(null);
+  }
 
-  const pending = users.filter((u) => u.role === "survivor");
-  const approved = users.filter((u) => u.role !== "survivor");
+  async function decline(u: UserDoc) {
+    setError("");
+    setMessage("");
+    if (!window.confirm("Decline the request from " + nameOf(u) + "?")) return;
+    setBusy(u.id);
+    try {
+      await updateDoc(doc(db, "users", u.id), { revoked: true, revokedAt: serverTimestamp() });
+      patchLocal(u.id, { revoked: true, revokedAt: { seconds: Math.floor(Date.now() / 1000) } });
+    } catch (err) {
+      console.error("Failed to decline:", err);
+      setError("Could not decline that request. Please try again.");
+    }
+    setBusy(null);
+  }
+
+  async function reconsider(u: UserDoc) {
+    setError("");
+    setMessage("");
+    setBusy(u.id);
+    try {
+      await updateDoc(doc(db, "users", u.id), { revoked: deleteField(), revokedAt: deleteField() });
+      patchLocal(u.id, { revoked: undefined, revokedAt: undefined });
+      setMessage(nameOf(u) + " is back in pending requests.");
+    } catch (err) {
+      console.error("Failed to restore request:", err);
+      setError("Could not do that. Please try again.");
+    }
+    setBusy(null);
+  }
+
+  function Controls({ u, label, onSave, onCancel }: { u: UserDoc; label: string; onSave: () => void; onCancel?: () => void }) {
+    const d = draftFor(u);
+    return (
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1">
+          <label htmlFor={"role-" + u.id} className="text-xs font-semibold text-on-surface-variant">Role</label>
+          <select id={"role-" + u.id} value={d.role} onChange={(e) => setDraft(u, "role", e.target.value)} className={inputClass}>
+            {ASSIGNABLE.map((r) => (
+              <option key={r} value={r}>{ROLE_LABEL[r]}</option>
+            ))}
+          </select>
+        </div>
+        {d.role !== "admin" && (
+          <div className="flex flex-col gap-1">
+            <label htmlFor={"org-" + u.id} className="text-xs font-semibold text-on-surface-variant">Organisation</label>
+            <input
+              id={"org-" + u.id}
+              list="org-suggestions"
+              value={d.orgId}
+              onChange={(e) => setDraft(u, "orgId", e.target.value)}
+              placeholder="e.g. alvf-yaounde"
+              className={inputClass}
+            />
+          </div>
+        )}
+        <div className="flex gap-2">
+          <button
+            onClick={onSave}
+            disabled={busy === u.id}
+            className="flex-1 inline-flex items-center justify-center gap-2 h-[48px] rounded-xl bg-primary-container text-on-primary font-semibold hover:bg-primary transition-colors disabled:opacity-50"
+          >
+            <Check size={18} />
+            {busy === u.id ? "Saving..." : label}
+          </button>
+          {onCancel && (
+            <button onClick={onCancel} className="px-4 h-[48px] rounded-xl bg-surface-container text-primary font-semibold hover:bg-surface-container-high transition-colors">
+              Cancel
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="mx-auto max-w-md p-6">
-      <h1 className="mb-4 text-lg font-medium text-ink">Staff Accounts</h1>
+    <StaffShell
+      title="Staff accounts"
+      subtitle="Approve new staff, change roles, and remove access when someone leaves."
+      adminOnly
+    >
+      <datalist id="org-suggestions">
+        {orgSuggestions.map((o) => (
+          <option key={o} value={o} />
+        ))}
+      </datalist>
 
-      <h2 className="mb-2 text-sm font-medium text-ink">Pending requests</h2>
-      {fetching && <p className="text-sm text-muted">Loading...</p>}
-      {!fetching && pending.length === 0 && (
-        <p className="mb-4 text-sm text-muted">No pending requests.</p>
-      )}
-      <ul className="mb-6 space-y-3">
-        {pending.map((u) => {
-          const sel = selections[u.id] ?? { role: "ngo_staff", orgId: "" };
-          return (
-            <li key={u.id} className="rounded-lg border border-border-soft bg-card p-4 shadow-sm">
-              <p className="text-sm font-medium text-ink">{u.email}</p>
+      {error && <p className="text-sm text-error font-semibold">{error}</p>}
+      {message && <p className="text-sm text-available-text font-semibold">{message}</p>}
 
-              <label htmlFor={"role-" + u.id} className="mt-2 block text-xs text-muted">
-                Assign role
-              </label>
-              <select
-                id={"role-" + u.id}
-                value={sel.role}
-                onChange={(e) => updateSelection(u.id, "role", e.target.value)}
-                className="mt-1 w-full rounded border border-border-soft px-2 py-1 text-sm"
-              >
-                {ASSIGNABLE_ROLES.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
-              </select>
+      <section className="grid grid-cols-3 gap-4">
+        <div className="rounded-xl bg-notice-bg text-notice-text p-5 shadow-sm">
+          <span className="text-xs uppercase tracking-wider font-bold opacity-80">Pending</span>
+          <p className="text-4xl font-semibold font-serif mt-1">{fetching ? "-" : pending.length}</p>
+        </div>
+        <div className="rounded-xl bg-available-bg text-available-text p-5 shadow-sm">
+          <span className="text-xs uppercase tracking-wider font-bold opacity-80">Active staff</span>
+          <p className="text-4xl font-semibold font-serif mt-1">{fetching ? "-" : active.length}</p>
+        </div>
+        <div className="rounded-xl bg-surface-container-lowest text-primary p-5 shadow-sm">
+          <span className="text-xs uppercase tracking-wider font-bold text-on-surface-variant">Removed</span>
+          <p className="text-4xl font-semibold font-serif mt-1">{fetching ? "-" : former.length}</p>
+        </div>
+      </section>
 
-              {sel.role !== "admin" && (
-                <>
-                  <label htmlFor={"org-" + u.id} className="mt-2 block text-xs text-muted">
-                    Organisation ID
-                  </label>
-                  <input
-                    id={"org-" + u.id}
-                    value={sel.orgId}
-                    onChange={(e) => updateSelection(u.id, "orgId", e.target.value)}
-                    placeholder="e.g. alvf-yaounde"
-                    className="mt-1 w-full rounded border border-border-soft px-2 py-1 text-sm"
-                  />
-                </>
-              )}
-
+      <section className="flex flex-col gap-3">
+        <h2 className="text-xl font-semibold text-primary">Pending requests</h2>
+        {!fetching && pending.length === 0 && <p className="text-sm text-on-surface-variant">No pending requests.</p>}
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {pending.map((u) => (
+            <li key={u.id} className="bg-surface-container-lowest rounded-xl shadow-sm p-5 flex flex-col gap-4">
+              <div>
+                <p className="font-semibold text-primary break-all">{nameOf(u)}</p>
+                {u.createdAt && (
+                  <p className="text-xs text-on-surface-variant mt-0.5">
+                    Requested {new Date(u.createdAt).toLocaleDateString()}
+                  </p>
+                )}
+              </div>
+              <Controls u={u} label="Approve" onSave={() => applyAccess(u)} />
               <button
-                onClick={() => approve(u)}
-                disabled={saving === u.id}
-                className="mt-3 w-full rounded bg-plum py-2 text-sm font-medium text-white hover:bg-plum-dark disabled:opacity-50"
+                onClick={() => decline(u)}
+                disabled={busy === u.id}
+                className="inline-flex items-center justify-center gap-2 h-[44px] rounded-xl bg-full-bg text-full-text text-sm font-semibold hover:opacity-80 transition-opacity disabled:opacity-50"
               >
-                {saving === u.id ? "Saving..." : "Approve"}
+                <X size={16} />
+                Decline request
               </button>
             </li>
-          );
-        })}
-      </ul>
+          ))}
+        </ul>
+      </section>
 
-      <h2 className="mb-2 text-sm font-medium text-ink">Approved staff</h2>
-      {!fetching && approved.length === 0 && (
-        <p className="text-sm text-muted">No approved staff yet.</p>
+      <section className="flex flex-col gap-3">
+        <h2 className="text-xl font-semibold text-primary">Active staff</h2>
+        {!fetching && active.length === 0 && <p className="text-sm text-on-surface-variant">No staff accounts yet.</p>}
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {active.map((u) => {
+            const isMe = u.id === user?.uid;
+            return (
+              <li key={u.id} className="bg-surface-container-lowest rounded-xl shadow-sm p-5 flex flex-col gap-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-primary break-all">
+                      {nameOf(u)}
+                      {isMe && <span className="ml-2 text-xs font-semibold text-tertiary">(you)</span>}
+                    </p>
+                    <p className="text-sm text-on-surface-variant mt-0.5">
+                      {ROLE_LABEL[u.role] || u.role}
+                      {u.orgId ? " \u2022 " + u.orgId : ""}
+                    </p>
+                  </div>
+                </div>
+
+                {editing === u.id ? (
+                  <Controls u={u} label="Save changes" onSave={() => applyAccess(u)} onCancel={() => setEditing(null)} />
+                ) : isMe ? (
+                  <p className="text-xs text-on-surface-variant flex items-start gap-1.5">
+                    <Info size={14} className="shrink-0 mt-0.5" />
+                    You can&apos;t change or remove your own access.
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => setEditing(u.id)}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container text-primary text-sm font-semibold hover:bg-surface-container-high transition-colors"
+                    >
+                      <Pencil size={16} />
+                      Change role or organisation
+                    </button>
+                    <button
+                      onClick={() => removeAccess(u)}
+                      disabled={busy === u.id}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-full-bg text-full-text text-sm font-semibold hover:opacity-80 transition-opacity disabled:opacity-50"
+                    >
+                      <UserX size={16} />
+                      Remove access
+                    </button>
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
+      {former.length > 0 && (
+        <section className="flex flex-col gap-3">
+          <h2 className="text-xl font-semibold text-primary">Removed or declined</h2>
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {former.map((u) => (
+              <li key={u.id} className="bg-surface-container-lowest rounded-xl shadow-sm p-5 flex flex-col gap-3">
+                <div>
+                  <p className="font-semibold text-primary break-all">{nameOf(u)}</p>
+                  {u.revokedAt && (
+                    <p className="text-xs text-on-surface-variant mt-0.5">
+                      {new Date(u.revokedAt.seconds * 1000).toLocaleDateString()}
+                    </p>
+                  )}
+                </div>
+                <button
+                  onClick={() => reconsider(u)}
+                  disabled={busy === u.id}
+                  className="self-start inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container text-primary text-sm font-semibold hover:bg-surface-container-high transition-colors disabled:opacity-50"
+                >
+                  <RotateCcw size={16} />
+                  Review again
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
-      <ul className="space-y-2">
-        {approved.map((u) => (
-          <li key={u.id} className="rounded-lg border border-border-soft bg-card p-3 text-sm">
-            <p className="font-medium text-ink">{u.email}</p>
-            <p className="text-muted">
-              {u.role}
-              {u.orgId ? " - " + u.orgId : ""}
-            </p>
-          </li>
-        ))}
-      </ul>
-    </div>
+
+      <p className="text-xs text-on-surface-variant max-w-2xl">
+        Removing access stops someone seeing any organisation data straight away, but their login still
+        exists. To delete it completely, remove the account in Firebase console, under Authentication.
+      </p>
+    </StaffShell>
   );
 }

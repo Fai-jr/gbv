@@ -1,11 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/AuthContext";
+import StaffShell from "@/components/StaffShell";
 import { TRAINING_TOPICS } from "@/lib/trainingContent";
-
-const STAFF_ROLES = ["ngo_staff", "shelter_staff", "admin"];
+import { ChevronDown } from "lucide-react";
 
 const KIND_LABEL: Record<string, string> = {
   video: "Video",
@@ -16,63 +13,53 @@ const KIND_LABEL: Record<string, string> = {
 };
 
 export default function TrainingPage() {
-  const { profile, loading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!loading && (!profile || !STAFF_ROLES.includes(profile.role))) {
-      router.replace("/staff/login");
-    }
-  }, [loading, profile, router]);
-
-  if (loading || !profile) return <p className="p-8">Loading...</p>;
-
   return (
-    <div className="mx-auto max-w-2xl p-6">
-      <h1 className="mb-2 text-xl font-semibold text-ink">Staff Training</h1>
-      <p className="mb-6 text-sm text-muted">
-        Starter material summarised from published sources. Before relying on it,
-        have a local GBV specialist check that it fits Cameroonian law and practice.
-      </p>
+    <StaffShell title="Staff training" subtitle="Starter material summarised from published sources.">
 
-      <div className="space-y-3">
+      <div className="flex flex-col gap-4 max-w-3xl">
         {TRAINING_TOPICS.map((topic) => (
-          <details key={topic.id} className="rounded-lg border border-border-soft bg-card p-4 shadow-sm">
-            <summary className="cursor-pointer font-medium text-ink">{topic.title}</summary>
+          <details key={topic.id} className="group bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+            <summary className="cursor-pointer list-none p-5 flex items-start justify-between gap-4 hover:bg-surface transition-colors">
+              <div>
+                <p className="text-lg font-semibold text-primary">{topic.title}</p>
+                <p className="text-sm text-on-surface-variant mt-1">{topic.summary}</p>
+              </div>
+              <ChevronDown size={22} className="text-primary shrink-0 transition-transform group-open:rotate-180" />
+            </summary>
 
-            <p className="mt-3 text-sm text-muted">{topic.summary}</p>
+            <div className="px-5 pb-5 flex flex-col gap-4">
+              {topic.sections.map((section) => (
+                <div key={section.heading}>
+                  <p className="font-semibold text-on-surface">{section.heading}</p>
+                  <ul className="mt-1.5 list-disc pl-5 flex flex-col gap-1.5 text-sm text-on-surface-variant">
+                    {section.points.map((point, i) => (
+                      <li key={i}>{point}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
 
-            {topic.sections.map((section) => (
-              <div key={section.heading} className="mt-4">
-                <p className="text-sm font-medium text-ink">{section.heading}</p>
-                <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-ink">
-                  {section.points.map((point, i) => (
-                    <li key={i}>{point}</li>
+              <div>
+                <p className="font-semibold text-on-surface">Learn more</p>
+                <ul className="mt-1.5 flex flex-col gap-2 text-sm">
+                  {topic.resources.map((r) => (
+                    <li key={r.url} className="flex items-start gap-2">
+                      <span className="shrink-0 px-2 py-0.5 rounded bg-surface-container text-xs text-on-surface-variant">
+                        {KIND_LABEL[r.kind]}
+                      </span>
+                      <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-primary underline decoration-tertiary">
+                        {r.label}
+                      </a>
+                    </li>
                   ))}
                 </ul>
               </div>
-            ))}
 
-            <div className="mt-4">
-              <p className="text-sm font-medium text-ink">Learn more</p>
-              <ul className="mt-1 space-y-1 text-sm">
-                {topic.resources.map((r) => (
-                  <li key={r.url}>
-                    <span className="mr-2 rounded bg-tint px-2 py-0.5 text-xs text-muted">
-                      {KIND_LABEL[r.kind]}
-                    </span>
-                    <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-plum underline">
-                      {r.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+              <p className="text-xs text-on-surface-variant">Based on: {topic.basedOn}</p>
             </div>
-
-            <p className="mt-4 text-xs text-muted">Based on: {topic.basedOn}</p>
           </details>
         ))}
       </div>
-    </div>
+    </StaffShell>
   );
 }

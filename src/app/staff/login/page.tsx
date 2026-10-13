@@ -5,12 +5,13 @@ import { useRouter } from "next/navigation";
 import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
+  signOut,
   setPersistence,
   browserSessionPersistence,
   browserLocalPersistence,
 } from "firebase/auth";
-import { auth } from "@/lib/firebase";
-import { safeExit } from "@/components/QuickExit";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
 import {
   Mail,
   KeyRound,
@@ -19,7 +20,6 @@ import {
   ShieldCheck,
   Lock,
   ArrowLeft,
-  LogOut,
   LogIn,
   ShieldAlert,
   Building2,
@@ -50,7 +50,14 @@ export default function StaffLoginPage() {
     setLoading(true);
     try {
       await setPersistence(auth, shared ? browserSessionPersistence : browserLocalPersistence);
-      await signInWithEmailAndPassword(auth, email.trim(), password);
+      const cred = await signInWithEmailAndPassword(auth, email.trim(), password);
+      const snap = await getDoc(doc(db, "users", cred.user.uid));
+      const role = snap.exists() ? snap.data().role : "survivor";
+      if (!["ngo_staff", "shelter_staff", "admin"].includes(role)) {
+        await signOut(auth);
+        setError("This account has not been approved for staff access. Please ask an administrator to approve it.");
+        return;
+      }
       router.push("/staff/dashboard");
     } catch (err: any) {
       if (err?.code === "auth/too-many-requests") {
@@ -89,14 +96,6 @@ export default function StaffLoginPage() {
               <span className="hidden sm:inline">Back to the public site</span>
               <span className="sm:hidden">Back</span>
             </a>
-            <button
-              type="button"
-              onClick={safeExit}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container-highest text-on-surface-variant text-sm font-semibold hover:bg-surface-container-high transition-colors"
-            >
-              <LogOut size={16} />
-              Quick Exit
-            </button>
           </div>
         </div>
 

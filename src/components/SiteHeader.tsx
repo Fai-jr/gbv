@@ -12,6 +12,7 @@ const NAV = [
   { label: "Chat", href: "/support/chat" },
   { label: "Market", href: "/marketplace" },
   { label: "Rights", href: "/rights" },
+  { label: "Community", href: "/community" },
   { label: "For friends", href: "/help-someone" },
 ];
 

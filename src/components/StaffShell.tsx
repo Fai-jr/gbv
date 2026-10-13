@@ -3,22 +3,20 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { wipeLocalData } from "@/lib/privacy";
 import { useAuth } from "@/lib/AuthContext";
-import { safeExit } from "@/components/QuickExit";
 import {
   LayoutDashboard,
   FolderOpen,
   Home as HomeIcon,
   Store,
   GraduationCap,
+  MessagesSquare,
   Phone,
   UserCog,
   TrendingUp,
   Lock,
   ArrowLeft,
-  LogOut,
   ShieldCheck,
   User,
 } from "lucide-react";
@@ -27,9 +25,10 @@ const STAFF_ROLES = ["ngo_staff", "shelter_staff", "admin"];
 
 const NAV = [
   { label: "Dashboard", href: "/staff/dashboard", icon: LayoutDashboard, roles: STAFF_ROLES },
-  { label: "Cases", href: "/staff/cases", icon: FolderOpen, roles: STAFF_ROLES },
-  { label: "Shelters", href: "/staff/shelter", icon: HomeIcon, roles: ["shelter_staff", "admin"] },
-  { label: "Marketplace listings", href: "/staff/marketplace", icon: Store, roles: STAFF_ROLES },
+  { label: "Cases", href: "/staff/cases", icon: FolderOpen, roles: ["ngo_staff", "shelter_staff"] },
+  { label: "Shelters", href: "/staff/shelter", icon: HomeIcon, roles: ["shelter_staff"] },
+  { label: "Marketplace listings", href: "/staff/marketplace", icon: Store, roles: ["ngo_staff", "shelter_staff"] },
+  { label: "Community moderation", href: "/staff/community", icon: MessagesSquare, roles: STAFF_ROLES },
   { label: "Training", href: "/staff/training", icon: GraduationCap, roles: STAFF_ROLES },
 ];
 
@@ -50,28 +49,49 @@ export default function StaffShell({
   subtitle,
   actions,
   adminOnly,
+  orgOnly,
   children,
 }: {
   title: string;
   subtitle?: string;
   actions?: React.ReactNode;
   adminOnly?: boolean;
+  orgOnly?: boolean;
   children: React.ReactNode;
 }) {
   const { user, profile, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
+  const isStaff = !!profile && STAFF_ROLES.includes(profile.role);
   const allowed =
-    !!profile && STAFF_ROLES.includes(profile.role) && (!adminOnly || profile.role === "admin");
+    isStaff &&
+    (!adminOnly || profile!.role === "admin") &&
+    (!orgOnly || profile!.role !== "admin");
 
   useEffect(() => {
-    if (!loading && !allowed) router.replace("/staff/login");
-  }, [loading, allowed, router]);
+    if (loading || allowed) return;
+    router.replace(isStaff ? "/staff/dashboard" : "/staff/login");
+  }, [loading, allowed, isStaff, router]);
+
+  useEffect(() => {
+    if (!allowed) return;
+    const LIMIT = 15 * 60 * 1000;
+    let timer = setTimeout(() => wipeLocalData("/staff/login"), LIMIT);
+    const reset = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => wipeLocalData("/staff/login"), LIMIT);
+    };
+    const events = ["mousemove", "keydown", "click", "touchstart", "scroll"];
+    events.forEach((e) => window.addEventListener(e, reset, { passive: true }));
+    return () => {
+      clearTimeout(timer);
+      events.forEach((e) => window.removeEventListener(e, reset));
+    };
+  }, [allowed]);
 
   async function lockNow() {
-    await signOut(auth);
-    router.replace("/staff/login");
+    await wipeLocalData("/staff/login");
   }
 
   if (loading || !allowed || !profile) {
@@ -184,17 +204,7 @@ export default function StaffShell({
               <h1 className="text-3xl font-semibold text-primary">{title}</h1>
               {subtitle && <p className="text-on-surface-variant mt-1">{subtitle}</p>}
             </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              {actions}
-              <button
-                type="button"
-                onClick={safeExit}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container-highest text-on-surface-variant text-sm font-semibold hover:bg-surface-container-high transition-colors"
-              >
-                <LogOut size={16} />
-                Quick Exit
-              </button>
-            </div>
+            {actions && <div className="flex items-center gap-2 flex-wrap">{actions}</div>}
           </div>
           {children}
         </main>
