@@ -4,9 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
+import { useLang } from "@/lib/i18n";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import { ShieldCheck, Phone, Search, MapPin, Lock, Languages, MessageCircle } from "lucide-react";
+import { ShieldCheck, Phone, Search, MapPin, MessageCircle, BadgeCheck } from "lucide-react";
 
 type Service = {
   id: string;
@@ -14,23 +15,34 @@ type Service = {
   type: string;
   phone: string;
   region: string;
+  verifiedAt?: { seconds: number };
 };
 
 const CATEGORIES = [
-  { key: "all", label: "All Services" },
-  { key: "legal aid", label: "Legal Aid" },
-  { key: "medical", label: "Medical Care" },
-  { key: "psychosocial", label: "Psychosocial Support" },
-  { key: "hotline", label: "24/7 Hotlines" },
+  { key: "all", label: "All services" },
+  { key: "legal aid", label: "Legal aid" },
+  { key: "medical", label: "Medical care" },
+  { key: "psychosocial", label: "Psychosocial support" },
+  { key: "hotline", label: "Hotlines" },
   { key: "shelter", label: "Shelter" },
 ];
 
+const TYPE_LABEL: Record<string, string> = {
+  hotline: "Hotline",
+  "legal aid": "Legal aid",
+  medical: "Medical",
+  psychosocial: "Psychosocial",
+  shelter: "Shelter",
+};
+
 const REGIONS = [
-  "all", "Centre", "Littoral", "Far North", "North-West", "South-West", "West", "National",
+  "Centre", "Littoral", "Far North", "North", "Adamawa",
+  "West", "North-West", "South-West", "East", "South", "National",
 ];
 
 export default function ContactsPage() {
   const { loading: authLoading } = useAuth();
+  const { t, lang } = useLang();
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
@@ -51,12 +63,13 @@ export default function ContactsPage() {
     return services.filter((s) => {
       const matchCat = category === "all" || s.type.toLowerCase().includes(category);
       const matchRegion = region === "all" || s.region.toLowerCase().includes(region.toLowerCase());
-      const matchQuery =
-        !query ||
-        (s.name + s.type + s.region).toLowerCase().includes(query.toLowerCase());
+      const q = query.toLowerCase();
+      const matchQuery = !q || (s.name + " " + s.type + " " + s.region).toLowerCase().includes(q);
       return matchCat && matchRegion && matchQuery;
     });
   }, [services, category, region, query]);
+
+  const locale = lang === "fr" ? "fr-FR" : "en-GB";
 
   return (
     <>
@@ -70,14 +83,12 @@ export default function ContactsPage() {
                 <div className="flex items-center gap-2 text-tertiary">
                   <ShieldCheck size={20} />
                   <span className="text-sm uppercase tracking-wider text-on-surface-variant">
-                    Accredited Network &bull; MINPROFF &amp; UN Certified
+                    {t("Verified by GBVConnect administrators")}
                   </span>
                 </div>
-                <h1 className="text-4xl font-semibold text-primary leading-tight">Verified Support Directory</h1>
+                <h1 className="text-4xl font-semibold text-primary leading-tight">{t("Verified Support Directory")}</h1>
                 <p className="text-on-surface-variant mt-1 leading-relaxed">
-                  Services listed here are added and verified by GBVConnect administrators, drawing on
-                  organisations such as MINPROFF, UNICEF, UNFPA, ALVF, and other civil-society networks.
-                  Every contact offers secure, judgment-free, confidential support.
+                  {t("Every contact here has been called and checked by a GBVConnect administrator. Numbers can still change, so if one does not work, try 116.")}
                 </p>
               </div>
               <div className="shrink-0 flex flex-col gap-2 w-full lg:w-auto">
@@ -86,9 +97,9 @@ export default function ContactsPage() {
                     <Phone size={24} />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs text-on-surface-variant uppercase">National GBV Helpline</span>
-                    <span className="text-lg font-semibold text-primary tracking-tight">Toll-Free 116</span>
-                    <span className="text-xs text-tertiary font-semibold">24/7 &bull; Free from MTN/Orange/Camtel</span>
+                    <span className="text-xs text-on-surface-variant uppercase">{t("National helpline")}</span>
+                    <span className="text-lg font-semibold text-primary tracking-tight">116</span>
+                    <span className="text-xs text-tertiary font-semibold">{t("Free to call")}</span>
                   </div>
                 </a>
               </div>
@@ -102,7 +113,7 @@ export default function ContactsPage() {
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search by organisation name, city, or service needed..."
+                  placeholder={t("Search by organisation name, city, or service needed...")}
                   className="w-full h-[52px] pl-12 pr-4 rounded-xl bg-surface-container-lowest text-on-surface placeholder:text-on-surface-variant/70 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-container"
                 />
               </div>
@@ -113,10 +124,9 @@ export default function ContactsPage() {
                   onChange={(e) => setRegion(e.target.value)}
                   className="w-full h-[52px] pl-11 pr-4 appearance-none rounded-xl bg-surface-container-lowest text-on-surface font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-container cursor-pointer"
                 >
+                  <option value="all">{t("All Cameroon regions")}</option>
                   {REGIONS.map((r) => (
-                    <option key={r} value={r}>
-                      {r === "all" ? "All Cameroon Regions" : r}
-                    </option>
+                    <option key={r} value={r}>{t(r)}</option>
                   ))}
                 </select>
               </div>
@@ -134,46 +144,36 @@ export default function ContactsPage() {
                       : "bg-surface-container-lowest text-on-surface-variant hover:text-on-surface")
                   }
                 >
-                  {c.label}
+                  {t(c.label)}
                 </button>
               ))}
             </div>
 
-            <div className="flex items-center justify-between text-sm text-on-surface-variant px-1">
-              <span>
-                {loading
-                  ? "Loading..."
-                  : `Showing ${filtered.length} verified partner ${filtered.length === 1 ? "agency" : "agencies"}`}
-              </span>
-              <div className="flex items-center gap-1.5 text-tertiary">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse" />
-                <span className="font-semibold">All Hotlines Live</span>
-              </div>
+            <div className="text-sm text-on-surface-variant px-1">
+              {loading
+                ? t("Loading...")
+                : t(filtered.length === 1 ? "Showing {n} verified contact" : "Showing {n} verified contacts", { n: filtered.length })}
             </div>
 
             {!loading && filtered.length === 0 && (
               <p className="text-center text-on-surface-variant py-10">
-                No contacts match right now. Try a different region or category.
+                {t("No contacts match right now. Try a different region or category.")}
               </p>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {filtered.map((s) => {
-                const callLink = "tel:" + s.phone;
                 const waLink = "https://wa.me/" + s.phone.replace(/[^0-9]/g, "");
                 return (
-                  <div
-                    key={s.id}
-                    className="flex flex-col justify-between rounded-xl bg-surface-container-lowest p-6 shadow-sm hover:shadow-md transition-shadow"
-                  >
+                  <div key={s.id} className="flex flex-col justify-between rounded-xl bg-surface-container-lowest p-6 shadow-sm hover:shadow-md transition-shadow">
                     <div className="flex flex-col gap-3">
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <span className="px-3 py-1 rounded-full bg-surface-container text-sm text-on-surface-variant font-semibold capitalize">
-                          {s.type}
+                        <span className="px-3 py-1 rounded-full bg-surface-container text-sm text-on-surface-variant font-semibold">
+                          {t(TYPE_LABEL[s.type] || s.type)}
                         </span>
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-sm font-bold">
-                          <span className="w-2 h-2 rounded-full bg-emerald-600" />
-                          Verified
+                          <BadgeCheck size={14} />
+                          {t("Verified")}
                         </span>
                       </div>
                       <div className="flex items-center gap-3">
@@ -184,42 +184,34 @@ export default function ContactsPage() {
                           <h3 className="text-lg font-semibold text-primary">{s.name}</h3>
                           <span className="text-sm text-on-surface-variant flex items-center gap-1">
                             <MapPin size={14} />
-                            {s.region}
+                            {t(s.region)}
                           </span>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-2 p-3 rounded-xl bg-surface-container-low text-on-surface-variant text-sm">
-                        <div className="flex items-center gap-2">
-                          <Languages size={16} className="text-primary" />
-                          <span>French &amp; English</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Lock size={16} className="text-primary" />
-                          <span>Strict Non-Disclosure</span>
-                        </div>
-                      </div>
+                      {s.verifiedAt && (
+                        <p className="text-xs text-on-surface-variant">
+                          {t("Last checked {date}", { date: new Date(s.verifiedAt.seconds * 1000).toLocaleDateString(locale) })}
+                        </p>
+                      )}
                     </div>
                     <div className="flex flex-wrap items-center gap-2 pt-4 mt-2">
-                      <a
-                        href={callLink}
-                        className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary text-on-primary font-semibold hover:bg-primary-container transition-colors shadow-sm"
-                      >
+                      <a href={"tel:" + s.phone} className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary text-on-primary font-semibold hover:bg-primary-container transition-colors shadow-sm">
                         <Phone size={18} />
-                        <span>Call {s.phone}</span>
+                        <span>{t("Call {phone}", { phone: s.phone })}</span>
                       </a>
-                      <a
-                        href={waLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-surface-container hover:bg-surface-container-high text-primary font-semibold transition-colors"
-                      >
+                      <a href={waLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-surface-container hover:bg-surface-container-high text-primary font-semibold transition-colors">
                         <MessageCircle size={18} />
-                        <span>WhatsApp</span>
+                        <span>{t("WhatsApp")}</span>
                       </a>
                     </div>
                   </div>
                 );
               })}
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl bg-surface-container text-sm text-on-surface-variant">
+              <span>{t("Did you manage to reach someone? Tell us how it went.")}</span>
+              <a href="/feedback" className="inline-flex items-center px-4 py-2 rounded-xl bg-surface-container-lowest text-primary font-semibold shadow-sm hover:bg-surface-container-high transition-colors">{t("Give feedback")}</a>
             </div>
           </div>
         </div>

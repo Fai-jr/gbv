@@ -1,0 +1,61 @@
+export const FR_DIRECTORY: Record<string, string> = {
+  // Directory
+  "Verified by GBVConnect administrators": "Vérifié par les administrateurs de GBVConnect",
+  "Verified Support Directory": "Annuaire de soutien vérifié",
+  "Every contact here has been called and checked by a GBVConnect administrator. Numbers can still change, so if one does not work, try 116.":
+    "Chaque contact présenté ici a été appelé et vérifié par un administrateur de GBVConnect. Les numéros peuvent toutefois changer ; si l'un d'eux ne fonctionne pas, essayez le 116.",
+  "Search by organisation name, city, or service needed...": "Rechercher par nom d'organisation, ville ou service recherché...",
+  "All Cameroon regions": "Toutes les régions du Cameroun",
+  "Far North": "Extrême-Nord",
+  "North": "Nord",
+  "Adamawa": "Adamaoua",
+  "West": "Ouest",
+  "North-West": "Nord-Ouest",
+  "South-West": "Sud-Ouest",
+  "East": "Est",
+  "South": "Sud",
+  "National": "National",
+  "Centre": "Centre",
+  "Littoral": "Littoral",
+  "All services": "Tous les services",
+  "Legal aid": "Aide juridique",
+  "Medical care": "Soins médicaux",
+  "Psychosocial support": "Soutien psychosocial",
+  "Hotlines": "Lignes d'écoute",
+  "Shelter": "Hébergement",
+  "Hotline": "Ligne d'écoute",
+  "Medical": "Médical",
+  "Psychosocial": "Psychosocial",
+  "Showing {n} verified contact": "{n} contact vérifié affiché",
+  "Showing {n} verified contacts": "{n} contacts vérifiés affichés",
+  "Loading...": "Chargement...",
+  "No contacts match right now. Try a different region or category.":
+    "Aucun contact ne correspond pour le moment. Essayez une autre région ou catégorie.",
+  "Verified": "Vérifié",
+  "Last checked {date}": "Dernière vérification : {date}",
+  "Call {phone}": "Appeler {phone}",
+  "WhatsApp": "WhatsApp",
+
+  // Refuge
+  "Safe places • Reached by phone": "Lieux sûrs • Joignables par téléphone",
+  "Safe Refuges & Temporary Shelter": "Refuges sûrs et hébergement temporaire",
+  "For the safety of every woman and child, shelter addresses are never published online. You reach a refuge through a phone contact, who explains what happens next.":
+    "Pour la sécurité de chaque femme et de chaque enfant, les adresses des refuges ne sont jamais publiées en ligne. Vous joignez un refuge par téléphone, et la personne qui répond vous explique la suite.",
+  "No addresses online": "Aucune adresse en ligne",
+  "Reached by phone": "Joignable par téléphone",
+  "You decide the next step": "Vous décidez de la suite",
+  "Need to leave urgently?": "Besoin de partir en urgence ?",
+  "If you are in danger or need to leave right now, call 116 directly rather than waiting.":
+    "Si vous êtes en danger ou devez partir immédiatement, appelez directement le 116 plutôt que d'attendre.",
+  "Call 116": "Appeler le 116",
+  "Verified phone contacts": "Contacts téléphoniques vérifiés",
+  "Shelter contacts": "Contacts des refuges",
+  "No verified shelter contacts yet. Please try the general contacts directory, or call 116.":
+    "Aucun contact de refuge vérifié pour le moment. Consultez l'annuaire général ou appelez le 116.",
+  "Location protected": "Lieu protégé",
+  "What to expect when you call": "À quoi s'attendre quand vous appelez",
+  "The person who answers will explain what the shelter can offer and what happens next. You can ask any question before you decide.":
+    "La personne qui répond vous expliquera ce que le refuge peut offrir et la suite. Vous pouvez poser toutes vos questions avant de décider.",
+  "Show the phone number": "Afficher le numéro de téléphone",
+  "Tap to call": "Appuyez pour appeler",
+};

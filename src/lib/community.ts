@@ -1,3 +1,10 @@
+export type Translate = (text: string, vars?: Record<string, string | number>) => string;
+
+const plain: Translate = (text, vars) => {
+  if (!vars) return text;
+  return Object.keys(vars).reduce((out, k) => out.split("{" + k + "}").join(String(vars[k])), text);
+};
+
 export const ROOMS = [
   { id: "welcome", name: "Welcome circle", description: "A gentle place to say hello and talk about how you are today." },
   { id: "healing", name: "Healing and recovery", description: "What helps with sleep, fear, trust and getting through hard days." },
@@ -29,6 +36,7 @@ export const HOUSE_RULES = [
 const ADJECTIVES = ["Quiet", "Gentle", "Brave", "Steady", "Warm", "Calm", "Bright", "Kind", "Hopeful", "Patient", "Strong", "Soft"];
 const NOUNS = ["River", "Sparrow", "Mango", "Baobab", "Rain", "Dawn", "Cedar", "Lantern", "Meadow", "Harbor", "Orchid", "Breeze"];
 const KEY = "gbvconnect-pseudonym";
+let fallbackName: string | null = null;
 
 function make() {
   const a = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
@@ -46,7 +54,8 @@ export function getPseudonym(): string {
     }
     return p;
   } catch {
-    return make();
+    if (!fallbackName) fallbackName = make();
+    return fallbackName;
   }
 }
 
@@ -58,18 +67,18 @@ export function resetPseudonym(): string {
   return p;
 }
 
-export function checkContent(text: string, max: number, min = 1): string | null {
-  const t = text.trim();
-  if (t.length < min) return min > 1 ? "Please write a little more." : "Please write something first.";
-  if (t.length > max) return "Please keep this under " + max + " characters.";
-  if (/(https?:\/\/|www\.|@)/i.test(t)) return "Please remove links and email addresses.";
-  if (/(?:\d[\s().-]?){7,}/.test(t)) return "Please remove phone numbers and long numbers.";
+export function checkContent(text: string, max: number, min = 1, t: Translate = plain): string | null {
+  const v = text.trim();
+  if (v.length < min) return min > 1 ? t("Please write a little more.") : t("Please write something first.");
+  if (v.length > max) return t("Please keep this under {n} characters.", { n: max });
+  if (/(https?:\/\/|www\.|@)/i.test(v)) return t("Please remove links and email addresses.");
+  if (/(?:\d[\s().-]?){7,}/.test(v)) return t("Please remove phone numbers and long numbers.");
   return null;
 }
 
 const URGENT = ["kill myself", "end my life", "suicide", "want to die", "going to kill me", "he is here", "weapon"];
 
 export function looksUrgent(text: string): boolean {
-  const t = text.toLowerCase();
-  return URGENT.some((w) => t.includes(w));
+  const v = text.toLowerCase();
+  return URGENT.some((w) => v.includes(w));
 }

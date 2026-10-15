@@ -10,6 +10,7 @@ import "@fontsource/literata/700.css";
 import "@fontsource/literata/400-italic.css";
 import "./globals.css";
 import { AuthProvider } from "@/lib/AuthContext";
+import { LanguageProvider } from "@/lib/i18n";
 import QuickExit from "@/components/QuickExit";
 import RegisterSW from "@/components/RegisterSW";
 
@@ -23,11 +24,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col bg-surface text-on-surface">
+        <LanguageProvider>
         <AuthProvider>
           <RegisterSW />
           {children}
           <QuickExit />
         </AuthProvider>
+        </LanguageProvider>
       </body>
     </html>
   );
