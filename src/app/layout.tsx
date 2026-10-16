@@ -18,6 +18,8 @@ export const metadata: Metadata = {
   title: "GBVConnect",
   description: "Connects survivors to services.",
   manifest: "/manifest.json",
+  icons: { icon: "/icon-192.png", apple: "/icon-192.png" },
+  robots: { index: false, follow: false },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
