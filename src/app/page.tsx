@@ -20,7 +20,6 @@ import {
   Trash2,
   Hospital,
   Gavel,
-  Users,
 } from "lucide-react";
 
 export default function HomePage() {
@@ -86,7 +85,9 @@ export default function HomePage() {
             </div>
             <div className="lg:col-span-5 relative">
               <div className="relative rounded-xl overflow-hidden shadow-xl bg-primary/80 h-80 sm:h-96 flex items-end">
-                <div className="p-6 text-on-primary">
+                <img src="/home/listening_space.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-linear-to-t from-primary/90 via-primary/30 to-transparent" />
+                <div className="relative z-10 p-6 text-on-primary">
                   <span className="text-xs text-primary-fixed uppercase tracking-wider">{t("A listening space")}</span>
                   <p className="text-lg italic font-serif mt-2">
                     &ldquo;{t("Here, every woman and every child can find a listening ear and a way to reach help.")}&rdquo;
@@ -274,7 +275,7 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="rounded-xl bg-surface-container-lowest overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
                 <div className="h-40 relative bg-surface-container-high flex items-center justify-center">
-                  <Gavel size={40} className="text-primary/30" />
+                  <img src="/home/law.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
                   <span className="absolute bottom-3 left-3 px-3 py-0.5 rounded-full bg-surface-container-lowest/90 text-sm text-primary backdrop-blur-sm">{t("The law")}</span>
                 </div>
                 <div className="p-6 flex flex-col justify-between flex-1 gap-4">
@@ -291,7 +292,7 @@ export default function HomePage() {
 
               <div className="rounded-xl bg-surface-container-lowest overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
                 <div className="h-40 relative bg-surface-container-high flex items-center justify-center">
-                  <Headset size={40} className="text-primary/30" />
+                  <img src="/home/advice.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
                   <span className="absolute bottom-3 left-3 px-3 py-0.5 rounded-full bg-surface-container-lowest/90 text-sm text-primary backdrop-blur-sm">{t("Advice for loved ones")}</span>
                 </div>
                 <div className="p-6 flex flex-col justify-between flex-1 gap-4">
@@ -308,7 +309,7 @@ export default function HomePage() {
 
               <div className="rounded-xl bg-surface-container-lowest overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
                 <div className="h-40 relative bg-surface-container-high">
-                  <img src="/marketplace/8.png" alt="" className="w-full h-full object-cover" />
+                  <img src="/home/economic.jpg" alt="" className="w-full h-full object-cover" />
                   <span className="absolute bottom-3 left-3 px-3 py-0.5 rounded-full bg-surface-container-lowest/90 text-sm text-primary backdrop-blur-sm">{t("Economic independence")}</span>
                 </div>
                 <div className="p-6 flex flex-col justify-between flex-1 gap-4">
@@ -325,7 +326,7 @@ export default function HomePage() {
 
               <div className="rounded-xl bg-surface-container-lowest overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
                 <div className="h-40 relative bg-surface-container-high flex items-center justify-center">
-                  <Users size={40} className="text-primary/30" />
+                  <img src="/home/peer_support.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
                   <span className="absolute bottom-3 left-3 px-3 py-0.5 rounded-full bg-surface-container-lowest/90 text-sm text-primary backdrop-blur-sm">{t("Peer support")}</span>
                 </div>
                 <div className="p-6 flex flex-col justify-between flex-1 gap-4">

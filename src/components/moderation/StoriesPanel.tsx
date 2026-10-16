@@ -4,6 +4,7 @@ import { Check, X } from "lucide-react";
 import { TOPIC_LABEL } from "@/lib/community";
 import { when } from "./types";
 import type { PendingStory } from "./types";
+import RevealIdentity from "./RevealIdentity";
 
 export default function StoriesPanel({
   stories,
@@ -25,6 +26,7 @@ export default function StoriesPanel({
           </div>
           <h2 className="text-xl font-semibold text-primary">{s.title}</h2>
           <p className="text-sm text-on-surface-variant">By {s.pseudonym}</p>
+          {s.authorUid && <RevealIdentity uid={s.authorUid} context="story" />}
           <p className="text-on-surface leading-relaxed whitespace-pre-line bg-surface-container-low rounded-xl p-4">{s.body}</p>
           <div className="flex flex-wrap gap-2">
             <button onClick={() => onReview(s, "published")} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-container text-on-primary font-semibold hover:bg-primary transition-colors">

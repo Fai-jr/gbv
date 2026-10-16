@@ -4,6 +4,7 @@ import { Check, X } from "lucide-react";
 import { TOPIC_LABEL } from "@/lib/community";
 import { when } from "./types";
 import type { Group } from "./types";
+import RevealIdentity from "./RevealIdentity";
 
 export default function GroupsPanel({
   groups,
@@ -25,6 +26,7 @@ export default function GroupsPanel({
           </div>
           <h2 className="text-xl font-semibold text-primary">{g.name}</h2>
           <p className="text-sm text-on-surface-variant">Proposed by {g.creatorPseudonym}</p>
+          <RevealIdentity uid={g.creatorUid} context="group request" />
           <p className="text-on-surface leading-relaxed whitespace-pre-line bg-surface-container-low rounded-xl p-4">{g.description}</p>
           <div className="flex flex-wrap gap-2">
             <button onClick={() => onReview(g, "approved")} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-container text-on-primary font-semibold hover:bg-primary transition-colors">

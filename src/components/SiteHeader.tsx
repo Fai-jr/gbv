@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Shield, User, Lock } from "lucide-react";
 import { safeExit } from "@/components/QuickExit";
+import { useAuth } from "@/lib/AuthContext";
 import { useLang } from "@/lib/i18n";
 
 const NAV = [
@@ -19,6 +20,8 @@ const NAV = [
 
 export default function SiteHeader({ active }: { active?: string }) {
   const { t, lang, setLang } = useLang();
+  const { user } = useAuth();
+  const member = !!user && !user.isAnonymous;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(74,59,82,0.06)]">
@@ -37,9 +40,7 @@ export default function SiteHeader({ active }: { active?: string }) {
                   aria-pressed={lang === l}
                   className={
                     "px-3 py-1 rounded-[10px] text-xs font-bold transition-colors " +
-                    (lang === l
-                      ? "bg-primary-container text-on-primary"
-                      : "text-on-surface-variant hover:text-on-surface")
+                    (lang === l ? "bg-primary-container text-on-primary" : "text-on-surface-variant hover:text-on-surface")
                   }
                 >
                   {l.toUpperCase()}
@@ -55,9 +56,18 @@ export default function SiteHeader({ active }: { active?: string }) {
               <Shield size={16} className="text-tertiary" />
               <span className="hidden sm:inline">{t("Quick Exit")}</span>
             </button>
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+            <Link
+              href={member ? "/account" : "/account/login"}
+              title={member ? t("My account") : t("Sign in")}
+              className={
+                member
+                  ? "w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"
+                  : "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary-container text-on-primary text-sm font-semibold hover:bg-primary transition-colors"
+              }
+            >
               <User size={16} className="text-on-primary" />
-            </div>
+              {!member && <span className="hidden sm:inline">{t("Sign in")}</span>}
+            </Link>
           </div>
         </div>
         <div className="flex items-center justify-between pb-1 overflow-x-auto">

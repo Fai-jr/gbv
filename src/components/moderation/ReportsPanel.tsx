@@ -3,6 +3,7 @@
 import { Trash2, VolumeX } from "lucide-react";
 import { when } from "./types";
 import type { Report } from "./types";
+import RevealIdentity from "./RevealIdentity";
 
 export type ReportAction = "dismiss" | "remove" | "remove-mute";
 
@@ -23,6 +24,7 @@ export default function ReportsPanel({
             <span className="text-xs text-on-surface-variant">{when(r.createdAt)}</span>
           </div>
           <p className="text-on-surface bg-surface-container-low rounded-xl p-3">{r.preview || "(no preview)"}</p>
+          {r.authorUid && <RevealIdentity uid={r.authorUid} context={r.kind + " report"} />}
           <div className="flex flex-wrap gap-2">
             <button onClick={() => onAct(r, "dismiss")} className="px-4 py-2 rounded-xl bg-surface-container text-primary text-sm font-semibold hover:bg-surface-container-high">
               Dismiss report

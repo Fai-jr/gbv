@@ -3,6 +3,7 @@
 import { Volume2 } from "lucide-react";
 import { when } from "./types";
 import type { Muted } from "./types";
+import RevealIdentity from "./RevealIdentity";
 
 export default function MutedPanel({ muted, onUnmute }: { muted: Muted[]; onUnmute: (uid: string) => void }) {
   return (
@@ -14,6 +15,7 @@ export default function MutedPanel({ muted, onUnmute }: { muted: Muted[]; onUnmu
             <div>
               <p className="font-semibold text-primary">Device {m.id.slice(0, 6)}</p>
               <p className="text-xs text-on-surface-variant">{when(m.mutedAt)}</p>
+              <RevealIdentity uid={m.id} context="muted member" />
             </div>
             <button onClick={() => onUnmute(m.id)} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container text-primary text-sm font-semibold hover:bg-surface-container-high">
               <Volume2 size={16} />

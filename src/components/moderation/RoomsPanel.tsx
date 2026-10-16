@@ -4,6 +4,7 @@ import { Eye, Trash2, VolumeX } from "lucide-react";
 import { ROOMS } from "@/lib/community";
 import { when } from "./types";
 import type { Group, Msg } from "./types";
+import RevealIdentity from "./RevealIdentity";
 
 export default function RoomsPanel({
   settings,
@@ -85,6 +86,7 @@ export default function RoomsPanel({
                   <span>{when(m.createdAt)}</span>
                 </div>
                 <p className="text-on-surface">{m.text}</p>
+                <RevealIdentity uid={m.authorUid} context="room message" />
                 <div className="flex gap-2">
                   <button onClick={() => onDeleteMessage(liveRoom, m.id)} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-full-bg text-full-text text-xs font-semibold hover:opacity-80">
                     <Trash2 size={14} />

@@ -8,6 +8,8 @@ import { FR_MORE } from "./fr-more";
 import { FR_CHAT } from "./fr-chat";
 import { FR_FRIENDS } from "./fr-friends";
 import { FR_VOICE } from "./fr-voice";
+import { FR_ACCOUNT } from "./fr-account";
+import { FR_NAMES } from "./fr-names";
 
 export const FR: Record<string, string> = {
   ...FR_SHELL,
@@ -20,4 +22,6 @@ export const FR: Record<string, string> = {
   ...FR_CHAT,
   ...FR_FRIENDS,
   ...FR_VOICE,
+  ...FR_ACCOUNT,
+  ...FR_NAMES,
 };
