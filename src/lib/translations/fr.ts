@@ -10,6 +10,7 @@ import { FR_FRIENDS } from "./fr-friends";
 import { FR_VOICE } from "./fr-voice";
 import { FR_ACCOUNT } from "./fr-account";
 import { FR_NAMES } from "./fr-names";
+import { FR_REFUGE } from "./fr-refuge";
 
 export const FR: Record<string, string> = {
   ...FR_SHELL,
@@ -24,4 +25,5 @@ export const FR: Record<string, string> = {
   ...FR_VOICE,
   ...FR_ACCOUNT,
   ...FR_NAMES,
+  ...FR_REFUGE,
 };

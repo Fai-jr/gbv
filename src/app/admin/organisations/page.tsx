@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -174,6 +175,10 @@ export default function OrganisationsPage() {
     }
     try {
       await updateDoc(doc(db, "organisations", o.id), { active });
+      if (!active) {
+        const snap = await getDocs(query(collection(db, "publicShelters"), where("orgId", "==", o.id)));
+        await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)));
+      }
       setOrgs((prev) => prev.map((x) => (x.id === o.id ? { ...x, active } : x)));
       setMessage(o.name + (active ? " is active again." : " is suspended."));
     } catch (err) {
