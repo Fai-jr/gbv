@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import { wipeLocalData } from "@/lib/privacy";
 import { useAuth } from "@/lib/AuthContext";
 import {
@@ -15,6 +17,7 @@ import {
   Phone,
   UserCog,
   TrendingUp,
+  Building2,
   Lock,
   ArrowLeft,
   ShieldCheck,
@@ -33,6 +36,7 @@ const NAV = [
 ];
 
 const ADMIN_NAV = [
+  { label: "Organisations", href: "/admin/organisations", icon: Building2 },
   { label: "Verified contacts", href: "/admin/services", icon: Phone },
   { label: "Staff accounts", href: "/admin/staff", icon: UserCog },
   { label: "Feedback statistics", href: "/admin/feedback", icon: TrendingUp },
@@ -43,6 +47,8 @@ const ROLE_LABEL: Record<string, string> = {
   shelter_staff: "Shelter staff",
   admin: "Administrator",
 };
+
+type OrgInfo = { for: string; name?: string; active: boolean };
 
 export default function StaffShell({
   title,
@@ -62,17 +68,36 @@ export default function StaffShell({
   const { user, profile, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const [orgInfo, setOrgInfo] = useState<OrgInfo | null>(null);
 
   const isStaff = !!profile && STAFF_ROLES.includes(profile.role);
   const allowed =
     isStaff &&
     (!adminOnly || profile!.role === "admin") &&
     (!orgOnly || profile!.role !== "admin");
+  const orgId = profile?.orgId;
 
   useEffect(() => {
     if (loading || allowed) return;
     router.replace(isStaff ? "/staff/dashboard" : "/staff/login");
   }, [loading, allowed, isStaff, router]);
+
+  useEffect(() => {
+    if (!allowed || !orgId) return;
+    let cancelled = false;
+    getDoc(doc(db, "organisations", orgId))
+      .then((snap) => {
+        if (cancelled) return;
+        const d = snap.exists() ? (snap.data() as { name?: string; active?: boolean }) : null;
+        setOrgInfo({ for: orgId, name: d?.name, active: d ? d.active !== false : true });
+      })
+      .catch(() => {
+        if (!cancelled) setOrgInfo({ for: orgId, active: true });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [allowed, orgId]);
 
   useEffect(() => {
     if (!allowed) return;
@@ -98,6 +123,34 @@ export default function StaffShell({
     return <p className="p-8 text-on-surface-variant">Loading...</p>;
   }
 
+  const orgReady = !orgId || orgInfo?.for === orgId;
+  if (!orgReady) return <p className="p-8 text-on-surface-variant">Loading...</p>;
+
+  if (orgId && orgInfo && !orgInfo.active) {
+    return (
+      <div className="min-h-screen bg-surface-container-low flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-surface-container-lowest rounded-xl shadow-sm p-8 flex flex-col gap-4">
+          <div className="w-12 h-12 rounded-xl bg-full-bg text-full-text flex items-center justify-center">
+            <Lock size={24} />
+          </div>
+          <h1 className="text-2xl font-semibold text-primary">Access suspended</h1>
+          <p className="text-on-surface-variant leading-relaxed">
+            Your organisation{orgInfo.name ? " (" + orgInfo.name + ")" : ""} has been suspended, so staff access is
+            switched off for now. Please contact the GBVConnect administrator.
+          </p>
+          <button
+            onClick={lockNow}
+            className="inline-flex items-center justify-center gap-2 h-[52px] rounded-xl bg-primary-container text-on-primary font-semibold hover:bg-primary transition-colors"
+          >
+            <Lock size={18} />
+            Sign out
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const orgName = orgInfo?.name;
   const items = NAV.filter((n) => n.roles.includes(profile.role));
   const isAdmin = profile.role === "admin";
 
@@ -124,7 +177,7 @@ export default function StaffShell({
               <p className="text-sm font-semibold text-on-surface truncate">{user?.email}</p>
               <p className="text-xs text-on-surface-variant truncate">
                 {ROLE_LABEL[profile.role]}
-                {profile.orgId ? " \u2022 " + profile.orgId : ""}
+                {orgName ? " \u2022 " + orgName : orgId ? " \u2022 " + orgId : ""}
               </p>
             </div>
           </div>
@@ -201,6 +254,12 @@ export default function StaffShell({
         <main className="max-w-[1100px] mx-auto px-4 sm:px-8 py-8 flex flex-col gap-6">
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
             <div>
+              {orgName && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 mb-2 rounded-full bg-surface-container text-tertiary text-xs font-bold uppercase tracking-wider">
+                  <Building2 size={14} />
+                  {orgName}
+                </span>
+              )}
               <h1 className="text-3xl font-semibold text-primary">{title}</h1>
               {subtitle && <p className="text-on-surface-variant mt-1">{subtitle}</p>}
             </div>

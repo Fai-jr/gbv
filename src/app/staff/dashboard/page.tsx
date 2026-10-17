@@ -114,7 +114,7 @@ export default function StaffDashboard() {
   return (
     <StaffShell
       title="Dashboard"
-      subtitle={orgId ? "Organisation: " + orgId : "Administrator account"}
+      subtitle={orgId ? "Your organisation's overview" : "Administrator account"}
       actions={
         orgId ? (
           <Link href="/staff/cases/new" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-container text-on-primary text-sm font-semibold hover:bg-primary transition-colors shadow-sm">

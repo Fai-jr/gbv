@@ -46,6 +46,7 @@ export default function AdminStaffPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [orgs, setOrgs] = useState<{ id: string; name: string; active: boolean }[]>([]);
 
   useEffect(() => {
     if (loading || profile?.role !== "admin") return;
@@ -67,6 +68,15 @@ export default function AdminStaffPage() {
       setFetching(false);
     }
     load();
+  }, [loading, profile]);
+
+  useEffect(() => {
+    if (loading || profile?.role !== "admin") return;
+    getDocs(collection(db, "organisations"))
+      .then((snap) =>
+        setOrgs(snap.docs.map((d) => ({ id: d.id, ...(d.data() as { name: string; active: boolean }) })))
+      )
+      .catch((err) => console.error("Failed to load organisations:", err));
   }, [loading, profile]);
 
   const pending = useMemo(() => users.filter((u) => u.role === "survivor" && u.email && !u.revoked), [users]);
@@ -202,14 +212,23 @@ export default function AdminStaffPage() {
         {d.role !== "admin" && (
           <div className="flex flex-col gap-1">
             <label htmlFor={"org-" + u.id} className="text-xs font-semibold text-on-surface-variant">Organisation</label>
-            <input
+            <select
               id={"org-" + u.id}
-              list="org-suggestions"
               value={d.orgId}
               onChange={(e) => setDraft(u, "orgId", e.target.value)}
-              placeholder="e.g. alvf-yaounde"
               className={inputClass}
-            />
+            >
+              <option value="">Choose an organisation...</option>
+              {orgs.filter((o) => o.active || o.id === d.orgId).map((o) => (
+                <option key={o.id} value={o.id}>{o.name} ({o.id})</option>
+              ))}
+              {d.orgId && !orgs.some((o) => o.id === d.orgId) && (
+                <option value={d.orgId}>{d.orgId} (no record yet)</option>
+              )}
+            </select>
+            {orgs.length === 0 && (
+              <span className="text-xs text-notice-text">No organisations yet. Create one under Organisations first.</span>
+            )}
           </div>
         )}
         <div className="flex gap-2">
