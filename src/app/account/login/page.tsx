@@ -1,5 +1,7 @@
 "use client";
 
+import { describeAuthError } from "@/lib/authErrors";
+
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -44,7 +46,12 @@ export default function AccountLoginPage() {
       if (err?.code === "auth/too-many-requests") {
         setError(t("Too many attempts. Please wait a few minutes and try again."));
       } else {
-        setError(t("Wrong email or password."));
+        const code = err?.code || "";
+        if (["auth/invalid-credential", "auth/wrong-password", "auth/user-not-found", "auth/invalid-email"].includes(code)) {
+          setError(t("Wrong email or password."));
+        } else {
+          setError(describeAuthError(err));
+        }
       }
       setBusy(false);
     }

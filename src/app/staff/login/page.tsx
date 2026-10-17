@@ -1,5 +1,7 @@
 "use client";
 
+import { describeAuthError } from "@/lib/authErrors";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -63,7 +65,7 @@ export default function StaffLoginPage() {
       if (err?.code === "auth/too-many-requests") {
         setError("Too many attempts. Please wait a few minutes and try again.");
       } else {
-        setError("Invalid email or password.");
+        setError(describeAuthError(err));
       }
     } finally {
       setLoading(false);

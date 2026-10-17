@@ -9,6 +9,7 @@ import {
   browserSessionPersistence,
   linkWithCredential,
   setPersistence,
+  signInAnonymously,
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -47,8 +48,11 @@ export default function RegisterPage() {
     setBusy(true);
     try {
       await setPersistence(auth, shared ? browserSessionPersistence : browserLocalPersistence);
-      const current = auth.currentUser;
-      if (!current || !current.isAnonymous) {
+      let current = auth.currentUser;
+      if (!current) {
+        current = (await signInAnonymously(auth)).user;
+      }
+      if (!current.isAnonymous) {
         setError(t("You are already signed in. Please sign out first."));
         setBusy(false);
         return;
@@ -80,7 +84,7 @@ export default function RegisterPage() {
       } else if (code === "auth/invalid-email") {
         setError(t("That email address does not look right."));
       } else {
-        setError(t("Could not create the account. Please try again."));
+        setError(t("Could not create the account. Please try again.") + " (" + (code || "unknown") + ")");
       }
       setBusy(false);
     }
